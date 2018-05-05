@@ -1,0 +1,5 @@
+//-------------------------//
+GREVENKO:
+    - Added ann_scene.sc scene with JSON format as an example
+    - Added ann_scene.c file for parsing JSON scenes (it isn't finished)
+//-------------------------//
