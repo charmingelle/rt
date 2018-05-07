@@ -1,12 +1,62 @@
 #include "rtv1.h"
 
-int		count_split(char **split) {
-	int	amount;
+#define SCENE 0
+#define CAMERA 1
+#define FIGURE 2
+#define LIGHT 3
+#define POINT 4
+#define STRING 5
+#define FLOAT 6
+#define ARRAY 7
+#define ROTATE 8
 
-	amount = 0;
-	while (*split++)
-		amount++;
-	return (amount);
+char	*get_name(char *string)
+{
+	int		i;
+	char	*name;
+
+	i = 0;
+	while (string[i] && string[i] != ':')
+		i++;
+	if (string[i] == 0)
+		return (NULL);
+	name = (char *)malloc(i + 1);
+	i = 0;
+	while (string[i] != ':')
+	{
+		name[i] = string[i];
+		i++;
+	}
+	name[i] = 0;
+	return (name);
+}
+
+char	*get_value(char *string)
+{
+	int		i;
+	int		len;
+	char	*value;
+	int		j;
+
+	i = 0;
+	while (string[i] && string[i] != ':')
+		i++;
+	if (string[i] == 0)
+		return (NULL);
+	i++;
+	len = ft_strlen(string);
+	value = (char *)malloc(len - i + 1);
+	j = 0;
+	while (string[i])
+		value[j++] = string[i++];
+	value[j] = 0;
+	return (value);
+}
+
+void	skip_extra(char **string)
+{
+	if (**string == ',' || **string == '}' || **string == ']')
+		(*string)++;
 }
 
 // need to pass address afrer { or []} as str. AFTER?
@@ -31,7 +81,8 @@ char	*check_brackets(char *str, char sc)
 
 // returns address after } or ]
 
-int		count_up_to(char *string, char *end_address) {
+int		count_up_to(char *string, char *end_address)
+{
 	int	amount;
 
 	amount = 0;
@@ -42,145 +93,248 @@ int		count_up_to(char *string, char *end_address) {
 	return (amount);
 }
 
-void	skip_commas_and_whitespaces(char *string) {
-	while (*string && (*string == ',' || *string == ' ' || *string == '\n' || *string == '\t'))
-		string++;
+void	parse_float(char *string, void *place_to_save)
+{
+	*((float *)place_to_save) = ft_atof(string);
 }
 
-void	parse_scene_object(char *string, void *place_to_save) {
-	while (*string) {
-		split = ft_strsplit(string, ":");
-		if (count_split(split) != 2)
-			ft_err_handler("Scene broken!", 0, 0, 1);
-		name = split[0];
-		value = split[1];
-		if (!ft_strcmp(name, "camera")))
-			string = skip_commas_and_whitespaces(get_object_string(value, "camera", place_to_save->cam));
-		else if (!ft_strcmp(name, "figures"))
-			string = skip_commas_and_whitespaces(get_array_string(value, place_to_save->scene->objs_h));
-		else if (!ft_strcmp(name, "lights"))
-			string = skip_commas_and_whitespaces(get_array_string(value, place_to_save->scene->light_h));
-		else
-			ft_err_handler("Scene broken!", 0, 0, 1);
-	}
-}
-
-void	parse_camera_object(char *string, void *place_to_save) {
-	while (*string) {
-		split = ft_strsplit(string, ":");
-		if (count_split(split) != 2)
-			ft_err_handler("Scene broken!", 0, 0, 1);
-		name = split[0];
-		value = split[1];
-		if (!ft_strcmp(name, "position")))
-			string = skip_commas_and_whitespaces(get_object_string(value, "point", place_to_save));
-		else if (!ft_strcmp(name, "angles"))
-			string = skip_commas_and_whitespaces(get_object_string(value, "point", place_to_save));
-		else if (!ft_strcmp(name, "distance"))
-			string = skip_commas_and_whitespaces(get_object_string(value, "float", place_to_save));
-		else
-			ft_err_handler("Scene broken!", 0, 0, 1);
-	}
-}
-
-void	parse_figure_object(char *string, void *place_to_save) {
-	while (*string) {
-		split = ft_strsplit(string, ":");
-		if (count_split(split) != 2)
-			ft_err_handler("Scene broken!", 0, 0, 1);
-		name = split[0];
-		value = split[1];
-		if (!ft_strcmp(name, "type")))
-			string = skip_commas_and_whitespaces(get_object_string(value, "string", place_to_save));
-		else if (!ft_strcmp(name, "center") || !ft_strcmp(name, "center2"))
-			string = skip_commas_and_whitespaces(get_object_string(value, "point", place_to_save));
-		else if (!ft_strcmp(name, "radius") || !ft_strcmp(name, "shine") || !ft_strcmp(name, "reflection") || !ft_strcmp(name, "transparency"))
-			string = skip_commas_and_whitespaces(get_object_sring(value, "float", place_to_save));
-		else if (!ft_strcmp(name, "color"))
-			string = skip_commas_and_whitespaces(get_color(value, place_to_save));
-		else if (!ft_strcmp(name, "texture"))
-			string = skip_commas_and_whitespaces(get_texture(value, place_to_save));
-		else
-			ft_err_handler("Scene broken!", 0, 0, 1);
-	}
-	validate_figure(figure, type);
-}
-
-void	parse_light_object(char *string, void *place_to_save) {
-	while (*string) {
-		split = ft_strsplit(string, ":");
-		if (count_split(split) != 2)
-			ft_err_handler("Scene broken!", 0, 0, 1);
-		name = split[0];
-		value = split[1];
-		if (!ft_strcmp(name, "type")))
-			string = skip_commas_and_whitespaces(get_object_string(value, "string", place_to_save));
-		else if (!ft_strcmp(name, "power")))
-			string = skip_commas_and_whitespaces(get_object_string(value, "float", place_to_save));
-		else if (!ft_strcmp(name, "position"))
-			string = skip_commas_and_whitespaces(get_object_string(value, "point", place_to_save));
-		else if (!ft_strcmp(name, "direction"))
-			string = skip_commas_and_whitespaces(get_object_string(value, "point", place_to_save));
-		else
-			ft_err_handler("Scene broken!", 0, 0, 1);
-	}
-	validate_light(figure, type);
-}
-
-void	parse_point_object(char *string, void *place_to_save) {
-	while (*string) {
-		split = ft_strsplit(string, ":");
-		if (count_split(split) != 2)
-			ft_err_handler("Scene broken!", 0, 0, 1);
-		name = split[0];
-		value = split[1];
-		if (!ft_strcmp(name, "x")) || ft_strcmp(name, "y") || !ft_strcmp(name, "z"))
-			string = skip_commas_and_whitespaces(get_object_string(value, "float", place_to_save));
-		else
-			ft_err_handler("Scene broken!", 0, 0, 1);
-	}
-}
-
-void	parse_object(char *string, char *type, void *place_to_save) {
-	char	**split;
+void	parse_point(char *string, void *place_to_save)
+{
 	char	*name;
 	char	*value;
-	char	*tail_start;
 
-	split = ft_strsplit(string, ":");
-	if (count_split(split) != 2)
-		ft_err_handler("Scene broken!", 0, 0, 1);
-	name = split[0];
-	value = split[1];
-	if (!ft_strcmp(name, "scene"))
-		parse_scene_object(value, place_to_save);
-	else if (!ft_strcmp(name, "camera"))
-		parse_canera_object(value, place_to_save);
-	else if (!ft_strcmp(name, "figure"))
-		parse_figure_object(value, place_to_save);
-	else if (!ft_strcmp(name, "light"))
-		parse_light_object(value, place_to_save);
-	else if (!ft_strcmp(name, "point"))
-		parse_point_object(value, place_to_save);
-	else if (!ft_strcmp(name, "string"))
-		parse_string(value, place_to_save);
-	else if (!ft_strcmp(name, "float"))
-		parse_float(value, place_to_save);
+	while (*string)
+	{
+		name = get_name(string);
+		value = get_value(string);
+		ft_printf("%s\n", name);
+		if (!ft_strcmp(name, "x"))
+			string = get_object_or_array_string(value, FLOAT, &(((t_point *)place_to_save)->x));
+		else if (!ft_strcmp(name, "y"))
+			string = get_object_or_array_string(value, FLOAT, &(((t_point *)place_to_save)->y));
+		else if (!ft_strcmp(name, "z"))
+			string = get_object_or_array_string(value, FLOAT, &(((t_point *)place_to_save)->z));
+		else
+			ft_err_handler("Scene broken!", 0, 0, 1);
+		skip_extra(&string);
+	}
 }
 
-char	*get_object_string(char *string, char *type, void *place_to_save {
-	char	*object_end_address;
-	int		object_string_len;
+void	parse_rotate(char *string, void *place_to_save)
+{
+	char	*name;
+	char	*value;
 
-	object_end_address = check_brackets(string, 0);
-	object_string_len = count_up_to(string, object_end_address);
-	parse_object(ft_strsub(string, 0, object_sring_len), type, place_to_save);
-	return (object_end_address);
+	while (*string)
+	{
+		name = get_name(string);
+		value = get_value(string);	
+		if (!ft_strcmp(name, "x"))
+			string = get_object_or_array_string(value, FLOAT, &(((t_rotate *)place_to_save)->rx));
+		else if (!ft_strcmp(name, "y"))
+			string = get_object_or_array_string(value, FLOAT, &(((t_rotate *)place_to_save)->ry));
+		else if (!ft_strcmp(name, "z"))
+			string = get_object_or_array_string(value, FLOAT, &(((t_rotate *)place_to_save)->rz));
+		else
+			ft_err_handler("Scene broken!", 0, 0, 1);
+		skip_extra(&string);
+	}
 }
 
-void	parse(char *string, t_env *env) {
-	ft_strtrim(string);
+void	parse_string(char *string, void *place_to_save)
+{
+	*((char **)place_to_save) = string;
+}
+
+void	parse_camera(char *string, void *place_to_save)
+{
+	char	*name;
+	char	*value;
+
+	while (*string)
+	{
+		name = get_name(string);
+		value = get_value(string);
+		ft_printf("%s\n", name);
+		if (!ft_strcmp(name, "position"))
+			string = get_object_or_array_string(value, POINT, &(((t_cam *)place_to_save)->pos));
+		else if (!ft_strcmp(name, "angles"))
+			string = get_object_or_array_string(value, ROTATE, &(((t_cam *)place_to_save)->rot));
+		else if (!ft_strcmp(name, "distance"))
+			string = get_object_or_array_string(value, FLOAT, &(((t_cam *)place_to_save)->rot_os));
+		else
+			ft_err_handler("Scene broken!", 0, 0, 1);
+		skip_extra(&string);
+	}
+}
+
+void	parse_scene(char *string, void *place_to_save)
+{
+	char	*name;
+	char	*value;
+
+	while (*string)
+	{
+		name = get_name(string);
+		value = get_value(string);
+		ft_printf("%s\n", name);
+		if (!ft_strcmp(name, "camera"))
+			string = get_object_or_array_string(value, CAMERA, &(((t_env *)place_to_save)->cam));
+		// else if (!ft_strcmp(name_name_value[0], "figures"))
+		// 	string = get_object_or_array_string(name_value[1], FIGURE, place_to_save->scene->objs_h);
+		// else if (!ft_strcmp(name_name_value[0], "lights"))
+		// 	string = get_object_or_array_string(name_value[1], LIGHT, place_to_save->scene->light_h);
+		else
+			ft_err_handler("Scene broken!", 0, 0, 1);
+		skip_extra(&string);
+	}
+}
+
+void	parse_array(char *string, void *place_to_save)
+{
+// 	char	**name_name;
+
+// 	while (*string)
+// 	{
+// 		string = get_object_or_array_string(string, type, place_to_save)
+// 		skip_extra(string);
+// 	}
+}
+
+void	parse_figure(char *string, void *place_to_save)
+{
+// 	char	**name_name;
+
+// 	while (*string) {
+// 		name_name = ft_strsplit(string, ":");
+// 		if (count_split(name_name) != 2)
+// 			ft_err_handler("Scene broken!", 0, 0, 1);
+// 		if (!ft_strcmp(name_value[0], "type")))
+// 			string = get_object_or_array_string(name_value[1], "string", place_to_save);
+// 		else if (!ft_strcmp(name_value[0], "center") || !ft_strcmp(name_name_value[1][0], "center2"))
+// 			string = get_object_or_array_string(name_value[1], "point", place_to_save);
+// 		else if (!ft_strcmp(name_value[0], "radius") || !ft_strcmp(name_name_value[1][0], "shine") || !ft_strcmp(name_name_value[1][0], "reflection") || !ft_strcmp(name_name_value[1][0], "transparency"))
+// 			string = get_object_sring(name_value[1], "float", place_to_save);
+// 		else if (!ft_strcmp(name_value[0], "color"))
+// 			string = get_color(name_value[1], place_to_save);
+// 		else if (!ft_strcmp(name_value[0], "texture"))
+// 			string = get_texture(name_value[1], place_to_save);
+// 		else
+// 			ft_err_handler("Scene broken!", 0, 0, 1);
+// 		skip_extra(string);
+// 	}
+// 	validate_figure(figure, type);
+}
+
+void	parse_light(char *string, void *place_to_save)
+{
+// 	char	**name_name;
+
+// 	while (*string) {
+// 		name_name = ft_strsplit(string, ":");
+// 		if (count_split(name_name) != 2)
+// 			ft_err_handler("Scene broken!", 0, 0, 1);
+// 		if (!ft_strcmp(name_name[0], "type")))
+// 			string = get_object_or_array_string(name_value[1], "string", place_to_save);
+// 		else if (!ft_strcmp(name_name[0], "power")))
+// 			string = get_object_or_array_string(name_value[1], "float", place_to_save);
+// 		else if (!ft_strcmp(name_name[0], "position"))
+// 			string = get_object_or_array_string(name_value[1], "point", place_to_save);
+// 		else if (!ft_strcmp(name_name[0], "direction"))
+// 			string = get_object_or_array_string(name_value[1], "point", place_to_save);
+// 		else
+// 			ft_err_handler("Scene broken!", 0, 0, 1);
+// 		skip_extra(string);
+// 	}
+// 	validate_light(figure, type);
+}
+
+void	parse_text_as(char *string, int type, void *place_to_save)
+{
+	void	(*parsers[9]) (char *text, void *place_to_save);
+
+	parsers[0] = parse_scene;
+	parsers[1] = parse_camera;
+	parsers[2] = parse_figure;
+	parsers[3] = parse_light;
+	parsers[4] = parse_point;
+	parsers[5] = parse_string;
+	parsers[6] = parse_float;
+	parsers[7] = parse_array;
+	parsers[8] = parse_rotate;
+	(*parsers[type])(string, place_to_save);
+}
+
+char	*get_object_or_array_string(char *string, int type, void *place_to_save)
+{
+	char	*end_address;
+	int		len;
+
+	end_address = check_brackets(string, 0);
+	len = count_up_to(string, end_address);
+	string++;
+	parse_text_as(ft_strsub(string, 0, len), type, place_to_save);
+	return (end_address);
+}
+
+void	parse(char *string, t_env *env)
+{
 	if (string[0] != '{')
 		ft_err_handler("Scene broken!", 0, 0, 1);
-	get_object_string(string, "scene", env);
+	get_object_or_array_string(string, SCENE, env);
+}
+
+int		count_whitespaces(char *string)
+{
+	int	count;
+
+	count = 0;
+	while (*string) {
+		if (*string == ' ' || *string == '\t' || *string == '\n')
+			count++;
+		string++;
+	}
+	return (count);
+}
+
+char	*remove_whitespaces(char *string)
+{
+	int		whitespaces;
+	char	*result;
+	int		i;
+
+	whitespaces = count_whitespaces(string);
+	result = (char *)malloc(whitespaces + 1);
+	i = 0;
+	while (*string)
+	{
+		if (*string != ' ' && *string != '\t' && *string != '\n') {
+			result[i] = *string;
+			i++;
+		}
+		string++;
+	}
+	result[i] = 0;
+	return (result);
+}
+
+void	read_scene(char *name, t_env *env)
+{
+	int		fd;
+	char	*line;
+	char	*temp;
+	char	*result;
+
+	fd = open(name, O_RDONLY);
+	if (fd == -1)
+		ft_err_handler("No such file", 0, 0, 1);
+	result = NULL;
+	while (ft_get_next_line(fd, &line) == 1)
+	{
+		temp = result;
+		result = ft_strjoin(result, line);
+		free(temp);
+		free(line);
+	}
+	parse(remove_whitespaces(result), env);
 }

@@ -1,5 +1,9 @@
 //-------------------------//
 GREVENKO:
     - Added ann_scene.sc scene with JSON format as an example
+    - Added ann_scene_simple.sc scene for debugging
     - Added ann_scene.c file for parsing JSON scenes (it isn't finished)
+    - Added Ann functions to rtv1.h, commented them
+    - Added my main to main.c, commented it
+    - Added NO Wall, Wextra, Werror flags, ann_scene.c source to Makefile, commented them
 //-------------------------//

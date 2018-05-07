@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+         #
+#    By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/12/10 17:05:19 by pgritsen          #+#    #+#              #
-#    Updated: 2018/05/05 14:41:10 by pgritsen         ###   ########.fr        #
+#    Updated: 2018/05/07 19:44:23 by grevenko         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,8 +18,10 @@ OS			=	$(shell uname)
 
 ifeq ($(OS), Linux)
 	CFLAGS		=	-Wextra -Wall -O3 -g3
+	# CFLAGS		=	-O3 -g3
 else
 	CFLAGS		=	-Wextra -Werror -Wall -O3 -g3
+	# CFLAGS		=	-O3 -g3
 endif
 
 HDRSDIR		=	./includes
@@ -30,6 +32,7 @@ SRCSDIR		=	./sources
 
 SRCS		=	main.c events.c fps.c utils.c draw.c opencl.c sys_handler.c		\
 				scene.c cleaner.c
+				# ann_scene.c
 
 OBJDIR		=	./obj
 

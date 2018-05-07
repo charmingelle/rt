@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   rtv1.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cozzmonavt <cozzmonavt@student.42.fr>      +#+  +:+       +#+        */
+/*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/15 13:43:42 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/03/10 15:32:04 by cozzmonavt       ###   ########.fr       */
+/*   Updated: 2018/05/07 19:41:15 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,5 +151,12 @@ void			free_splited(char **arr);
 
 void			ft_err_handler(const char *msg, const char *add,
 								int err, t_uchar stop);
+
+/*
+**				Anna
+*/
+
+// void			read_scene(char *name, t_env *env);
+// char			*get_object_or_array_string(char *string, int type, void *place_to_save);
 
 #endif

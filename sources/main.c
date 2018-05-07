@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/15 13:43:02 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/03/08 19:24:43 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/07 19:42:03 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,3 +34,18 @@ int	main(int ac, char **av)
 	}
 	return (sgl_quit());
 }
+
+// int		main(int ac, char **av)
+// {
+// 	t_env	env;
+
+// 	sgl_init();
+// 	init_env(&env);
+// 	if (ac == 2)
+// 	{
+// 		read_scene(av[1], &env);
+// 		// ft_printf("(%f, %f, %f)\n", env.cam->pos.x, env.cam->pos.y, env.cam->pos.z);
+// 		// ft_printf("(%f, %f, %f)\n", env.cam->rot.rx, env.cam->rot.ry, env.cam->rot.rz);
+// 		// ft_printf("%f\n", env.cam->rot_os);
+// 	}
+// }
