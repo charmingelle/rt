@@ -6,7 +6,7 @@
 /*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/15 13:43:42 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/07 19:41:15 by grevenko         ###   ########.fr       */
+/*   Updated: 2018/05/08 17:33:05 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ int				poll_events(t_env *env);
 **				↓↓↓↓↓↓↓
 */
 
-void			read_scene(t_env *env, int ac, char **av);
+// void			read_scene(t_env *env, int ac, char **av);
 
 /*
 **				Fps.c
@@ -156,7 +156,8 @@ void			ft_err_handler(const char *msg, const char *add,
 **				Anna
 */
 
-// void			read_scene(char *name, t_env *env);
-// char			*get_object_or_array_string(char *string, int type, void *place_to_save);
+void			read_scene(char *name, t_env *env);
+char			*get_object_or_array_string(char *string, int type, void *place_to_save);
+char			*parse_text_as(char *string, int type, void *place_to_save);
 
 #endif
