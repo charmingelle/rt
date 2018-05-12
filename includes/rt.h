@@ -1,21 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   rtv1.h                                             :+:      :+:    :+:   */
+/*   rt.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/15 13:43:42 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/08 17:33:05 by grevenko         ###   ########.fr       */
+/*   Updated: 2018/05/12 14:17:41 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef RTV1_H
-# define RTV1_H
+#ifndef RT_H
+# define RT_H
 
 # include <stdio.h>
 # include <time.h>
 # include <errno.h>
+# include <fcntl.h>
 
 # define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 # ifdef __APPLE__
@@ -37,7 +38,13 @@
 
 # define EXIT_KEY SDLK_ESCAPE
 
-# define CAMERA_M(n)(n & 0b1)
+# define RANGE(x, l1, l2)(x < l1 ? l1 : x > l2 ? l2 : x)
+# define TORGB(coef)((uint)(RANGE(coef, 0.0F, 1.0F) * 255.0F + 0.5F))
+# define TOHEX(r, g, b)((uint)r * 0x10000 + (uint)g * 0x100 + (uint)b)
+
+# define INTERACTIVE_M(n)(n & 0b1)
+# define MOVE_F(n)(n & 0b10 && INTERACTIVE_M(n))
+# define MOVE_B(n)(n & 0b100 && INTERACTIVE_M(n))
 
 typedef struct	s_cl_core
 {
@@ -55,21 +62,25 @@ typedef struct	s_cl_kl
 
 typedef struct	s_cam
 {
-	t_point		pos;
-	t_rotate	rot;
-	t_uint		rot_os;
+	cl_float3	pos;
+	cl_float3	rot;
+	uint		rot_os;
 	t_cl_kl		kl;
 	t_viewport	*vwp;
 }				t_cam;
 
 typedef struct	s_scene
 {
-	cl_mem	objs;
-	cl_mem	light;
-	t_uint	objs_c;
-	t_uint	light_c;
-	t_obj	*objs_h;
-	t_light	*light_h;
+	cl_mem		objs;
+	cl_mem		light;
+	uint		objs_c;
+	uint		light_c;
+	t_obj		*objs_h;
+	t_light		*light_h;
+	cl_mem		colors;
+	cl_float3	*colors_h;
+	uint		sampls;
+	uint		timestamp;
 }				t_scene;
 
 typedef struct	s_env
@@ -85,6 +96,8 @@ typedef struct	s_env
 **				Draw.c
 **				↓↓↓↓↓↓
 */
+
+void			init_scene(t_env *env);
 
 void			render_scene(t_env *env);
 
@@ -103,16 +116,40 @@ int				poll_events(t_env *env);
 // void			read_scene(t_env *env, int ac, char **av);
 
 /*
-**				Fps.c
-**				↓↓↓↓↓
+**				Stats.c
+**				↓↓↓↓↓↓↓
 */
 
 void			display_fps(SDL_Renderer *rend);
+
+void			display_stats(t_env *env, SDL_Renderer *rend);
+
+/*
+**				Movement.c
+**				↓↓↓↓↓↓↓↓↓↓
+*/
+
+void			move(t_env *env, char dir);
+
+void			handle_movement(SDL_Scancode key, t_env *env, char state);
+
+/*
+**				Vec.c
+**				↓↓↓↓↓
+*/
+
+cl_float3		vec_add(cl_float3 v1, cl_float3 v2);
+
+cl_float3		vec_sub(cl_float3 v1, cl_float3 v2);
+
+cl_float3		vec_mult_num(cl_float3 v1, float num);
 
 /*
 **				Utils.c
 **				↓↓↓↓↓↓↓
 */
+
+cl_float3		tofloat3(t_point point);
 
 void			display_usage(t_uchar help);
 
@@ -139,6 +176,8 @@ void			cl_parse_kernel(t_cl_core *cl, t_cl_kl *kl,
 **				Cleaner.c
 **				↓↓↓↓↓↓↓↓↓
 */
+
+void			quit_msg(t_env *env);
 
 int				count_splited(char **arr);
 

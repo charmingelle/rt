@@ -1,23 +1,18 @@
-#include "rtv1.h"
+#include "rt.h"
 
 char	*get_name(char *string)
 {
-	ft_printf("GET_NAME\n");
 	int		i;
 	char	*name;
 
 	i = 0;
 	while (string[i] && string[i] != ':')
 		i++;
-	if (string[i] == 0)
-		return (NULL);
-	ft_printf("GET_NAME_END\n");
 	return (ft_strsub(string, 0, i));
 }
 
 char	*get_value(char *string)
 {
-	ft_printf("GET_VALUE\n");
 	int		i;
 	int		len;
 
@@ -28,53 +23,48 @@ char	*get_value(char *string)
 		return (NULL);
 	i++;
 	len = ft_strlen(string);
-	ft_printf("GET_VALUE_END\n");	
 	return (ft_strsub(string, i, len - i));
 }
 
-void	skip_extra(char **string)
+void	skip_comma(char **string)
 {
-	while (*string && (**string == ',' || **string == '{' || **string == '[' || **string == '}' || **string == ']'))
+	if (**string != ',' && **string != '}' && **string != ']')
+		ft_err_handler("Comma is missing", 0, 0, 1);
+	if (**string == ',')
 		(*string)++;
 }
 
-// need to pass address afrer { or []} as str. AFTER?
-
-char	*check_brackets(char *str, char sc)
+void	skip_open_brace(char **string)
 {
-	char	tmp;
-
-	while (*str != sc)
-		if (*str == '{' || *str == '[' || *str == '"')
-		{
-			tmp = *str++;
-			if (!(str = check_brackets(str, tmp + 2)))
-				return (NULL);
-		}
-		else if (*str == '}' || *str == ']' || !*str || *str == '"')
-			return (NULL);
-		else
-			str++;
-	return (str + 1);
+	if (**string != '{')
+		ft_err_handler("Open brace is missing", 0, 0, 1);
+	(*string)++;
 }
 
-// returns address after } or ]
-
-int		count_up_to(char *string, char *end_address)
+void	skip_close_brace(char **string)
 {
-	int	amount;
+	if (**string != '}')
+		ft_err_handler("Closing brace is missing", 0, 0, 1);
+	(*string)++;
+}
 
-	amount = 0;
-	while (*string && string != end_address) {
-		amount++;
-		string++;
-	}
-	return (amount);
+void	skip_open_bracket(char **string)
+{
+	if (**string != '[')
+		ft_err_handler("Open bracket is missing", 0, 0, 1);
+	(*string)++;
+}
+
+void	skip_close_bracket(char **string)
+{
+	if (**string != ']')
+		ft_err_handler("Closing bracket is missing", 0, 0, 1);
+	(*string)++;
 }
 
 int		is_digit(char c)
 {
-	return (c >= '0' && c <= '9');
+	return ((c >= '0' && c <= '9') || c == '-');
 }
 
 int		get_object_end(char *string)
@@ -102,78 +92,86 @@ int		get_object_end(char *string)
 	return (i);
 }
 
-int		get_int_end(char *string)
+int		get_primitive_end(char *string)
 {
 	int	i;
 
 	i = 0;
-	while (string[i] && is_digit(string[i]))
+	while (string[i] && string[i] != ',' && string[i] != '}')
 		i++;
 	if (string[i] == 0)
 		return (-1);
 	return (i);
 }
 
-char	*parse_int(char *string, t_uint *place_to_save)
+char	*parse_u_int(char *string, t_uint *place_to_save)
+{
+	int		end;
+	char	*head;
+	int		value;
+
+	end = get_primitive_end(string);
+	head = ft_strsub(string, 0, end);
+	if ((value = ft_atoi(head)) < 0)
+		ft_err_handler("Camera distance cannot be negative", 0, 0, 1);
+	*place_to_save = value;
+	free(head);
+	return (ft_strsub(string, end, ft_strlen(string) - end));
+}
+
+char	*parse_int(char *string, int *place_to_save)
 {
 	int		end;
 	char	*head;
 
-	end = get_int_end(string);
+	end = get_primitive_end(string);
 	head = ft_strsub(string, 0, end);
 	*place_to_save = ft_atoi(head);
 	free(head);
 	return (ft_strsub(string, end, ft_strlen(string) - end));
 }
 
-int		get_double_end(char *string) {
-	int	i;
-
-	i = 0;
-	while (string[i] && (is_digit(string[i]) || string[i] == '.'))
-		i++;
-	if (string[i] == 0)
-		return (-1);
-	return (i);
-}
-
-char	*parse_double(char *string, double *place_to_save)
+char	*parse_float(char *string, float *place_to_save)
 {
 	int		end;
 	char	*head;	
 
-	end = get_double_end(string);
+	end = get_primitive_end(string);
 	head = ft_strsub(string, 0, end);
-	ft_printf("place_to_save = %p, double = %f\n", place_to_save, ft_atof(head));
 	*place_to_save = ft_atof(head);
 	free(head);
 	return (ft_strsub(string, end, ft_strlen(string) - end));
 }
 
-int		get_string_end(char *string)
+char	*parse_ufloat(char *string, float *place_to_save)
 {
-	int	i;
+	int		end;
+	char	*head;
+	float	value;
 
-	i = 0;
-	while (string[i] && string[i] != '"')
-		i++;
-	if (string[i] == 0)
-		return (-1);
-	return (i);
+	end = get_primitive_end(string);
+	head = ft_strsub(string, 0, end);
+	if ((value = ft_atof(head)) < 0)
+		ft_err_handler("Figure radius, angle, reflection, transparency; light power cannot be negative", 0, 0, 1);
+	*place_to_save = value;
+	free(head);
+	return (ft_strsub(string, end, ft_strlen(string) - end));
 }
 
 char	*parse_string(char *string, char **place_to_save)
 {
 	int		end;
 
-	end = get_string_end(string);
-	*place_to_save = ft_strsub(string, 0, end);
+	end = get_primitive_end(string);
+	if (string[0] != '"' || string[end - 1] != '"')
+		ft_err_handler("String values should be in quote marks", 0, 0, 1);
+	*place_to_save = ft_strsub(string, 1, end - 2);
 	return (ft_strsub(string, end, ft_strlen(string) - end));
 }
 
-int		get_type(char *string)
+int		get_figure_type(char *string)
 {
-	char	*types[4] = {"sphere", "cylinder", "cone", "plane"};
+	char	*types[4] = {"\"sphere\"", "\"cylinder\"", "\"cone\"", "\"plane\""};
 	int		i;
 
 	i = 0;
@@ -183,82 +181,42 @@ int		get_type(char *string)
 			return (i);
 		i++;
 	}
+	ft_err_handler("Unknown figure type", 0, 0, 1);
 	return (-1);
 }
 
-char	*parse_type(char *string, int *place_to_save)
+char	*parse_figure_type(char *string, short int *place_to_save)
 {
 	int		end;
 
-	end = get_string_end(string);
-	*place_to_save = get_type(ft_strsub(string, 0, end));
+	end = get_primitive_end(string);
+	*place_to_save = get_figure_type(ft_strsub(string, 0, end));
 	return (ft_strsub(string, end, ft_strlen(string) - end));
 }
 
-char	*parse_point(char *string, t_point *place_to_save)
+char	*parse_cl_float3(char *string, cl_float3 *place_to_save)
 {
 	char	*name;
 	char	*value;
-	char	*end_address;
-	int		len;
 	
-	while (*string)
+	skip_open_brace(&string);
+	while (*string && *string != '}')
 	{
-		if (*string == '}')
-		{
-			skip_extra(&string);
-			break;
-		}
-		skip_extra(&string);
 		name = get_name(string);
 		value = get_value(string);
-		ft_printf("name = %s\n", name);
-		ft_printf("value = %s\n", value);
 		if (!ft_strcmp(name, "\"x\""))
-		{
-			ft_printf("x = %p\n", &place_to_save->x);
-			string = parse_double(value, &place_to_save->x);
-		}
+			string = parse_float(value, &place_to_save->x);
 		else if (!ft_strcmp(name, "\"y\""))
-			string = parse_double(value, &place_to_save->y);
+			string = parse_float(value, &place_to_save->y);
 		else if (!ft_strcmp(name, "\"z\""))
-			string = parse_double(value, &place_to_save->z);
+			string = parse_float(value, &place_to_save->z);
 		else
-			ft_err_handler("Scene broken!", 0, 0, 1);
+			ft_err_handler("Unknown point property", 0, 0, 1);
+		skip_comma(&string);
 		free(name);
 		free(value);
 	}
-	return (string);
-}
-
-char	*parse_rotate(char *string, t_rotate *place_to_save)
-{
-	char	*name;
-	char	*value;
-
-	while (*string)
-	{
-		if (*string == '}')
-		{
-			skip_extra(&string);
-			break;
-		}
-		skip_extra(&string);
-		name = get_name(string);
-		value = get_value(string);
-		ft_printf("name = %s\n", name);
-		ft_printf("value = %s\n", value);
-		if (!ft_strcmp(name, "\"rx\""))
-			string = parse_double(value, &place_to_save->rx);
-		else if (!ft_strcmp(name, "\"ry\""))
-			string = parse_double(value, &place_to_save->ry);
-		else if (!ft_strcmp(name, "\"rz\""))
-			string = parse_double(value, &place_to_save->rz);
-		else
-			ft_err_handler("Scene broken!", 0, 0, 1);
-		free(name);
-		free(value);
-	}
+	skip_close_brace(&string);
 	return (string);
 }
 
@@ -267,87 +225,65 @@ char	*parse_camera(char *string, t_cam *place_to_save)
 	char	*name;
 	char	*value;
 
-	while (*string)
+	skip_open_brace(&string);
+	while (*string && *string != '}')
 	{
-		if (*string == '}')
-		{
-			skip_extra(&string);
-			break;
-		}
-		skip_extra(&string);
 		name = get_name(string);
 		value = get_value(string);
-		ft_printf("FROM CAMERA: string = %s\n", string);
-		ft_printf("name = %s\n", name);
-		ft_printf("compare result = %d\n", ft_strcmp(name, "\"angles\""));
-		ft_printf("value = %s\n", value);
 		if (!ft_strcmp(name, "\"position\""))
-		{
-			ft_printf("cam = %p,\npos = %p\n", place_to_save, &(place_to_save->pos));
-			string = parse_point(value, &place_to_save->pos);
-		}
+			string = parse_cl_float3(value, &place_to_save->pos);
 		else if (!ft_strcmp(name, "\"angles\""))
-			string = parse_rotate(value, &place_to_save->rot);
+			string = parse_cl_float3(value, &place_to_save->rot);
 		else if (!ft_strcmp(name, "\"distance\""))
-			string = parse_int(value, &place_to_save->rot_os);
+			string = parse_u_int(value, &place_to_save->rot_os);
 		else
-			ft_err_handler("Scene broken!", 0, 0, 1);
+			ft_err_handler("Unknown camera property", 0, 0, 1);
+		skip_comma(&string);
 		free(name);
 		free(value);
 	}
+	skip_close_brace(&string);
 	return (string);
 }
-
-// env->scene.objs_h[index].type = ABS(ft_atoi(arr[0]));
-// env->scene.objs_h[index].color = ft_atol_base(arr[1], 16);
-// env->scene.objs_h[index].pos = sgl_atop(arr[2]);
-// env->scene.objs_h[index].dir = sgl_atop(arr[3]);
-// if (!sgl_check_point(env->scene.objs_h[index].pos)
-// 	|| !sgl_check_point(env->scene.objs_h[index].dir))
-// 	ft_err_handler("Object broken!", 0, 0, 1);
-// env->scene.objs_h[index].rad = ABS(ft_atof(arr[4]));
-// env->scene.objs_h[index].spec = ABS(ft_atoi(arr[5]));
-// env->scene.objs_h[index].refl = ABS(ft_atof(arr[6]));
 
 char	*parse_figure(char *string, t_obj *place_to_save)
 {
 	char	*name;
 	char	*value;
 
-	while (*string) {
-		if (*string == '}')
-		{
-			skip_extra(&string);
-			break;
-		}
-		skip_extra(&string);
+	skip_open_brace(&string);
+	while (*string && *string != '}') {
 		name = get_name(string);
 		value = get_value(string);
-		ft_printf("name = %s\n", name);
-		ft_printf("value = %s\n", value);
 		if (!ft_strcmp(name, "\"type\""))
-			string = parse_type(value, &place_to_save->type);
+			string = parse_figure_type(value, &place_to_save->type);
 		else if (!ft_strcmp(name, "\"center\""))
-			string = parse_point(value, &place_to_save->pos);
+			string = parse_cl_float3(value, &place_to_save->pos);
 		else if (!ft_strcmp(name, "\"center2\"") || !ft_strcmp(name, "\"normal\""))
-			string = parse_point(value, &place_to_save->dir);
+			string = parse_cl_float3(value, &place_to_save->dir);
+		else if (!ft_strcmp(name, "\"emission\""))
+			string = parse_cl_float3(value, &place_to_save->emission);
 		else if (!ft_strcmp(name, "\"radius\""))
-			string = parse_double(value, &place_to_save->rad);
+			string = parse_ufloat(value, &place_to_save->rad);
+		else if (!ft_strcmp(name, "\"angle\""))
+			string = parse_ufloat(value, &place_to_save->rad);
 		else if (!ft_strcmp(name, "\"color\""))
-			string = parse_point(value, &place_to_save->color);
+			string = parse_cl_float3(value, &place_to_save->color);
 		else if (!ft_strcmp(name, "\"shine\""))
-			string = parse_double(value, &place_to_save->spec);
+			string = parse_int(value, &place_to_save->spec);
 		else if (!ft_strcmp(name, "\"reflection\""))
-			string = parse_double(value, &place_to_save->refl);
-		// else if (!ft_strcmp(name, "\"transparency\""))
-		// 	string = parse_double(value, &place_to_save.transp);
-		// else if (!ft_strcmp(name, "\"texture\""))
-		// 	string = parse_texture(value, &place_to_save.texture);
+			string = parse_ufloat(value, &place_to_save->refl);
+		else if (!ft_strcmp(name, "\"transparency\""))
+			string = parse_ufloat(value, &place_to_save->transp);
+		else if (!ft_strcmp(name, "\"texture\""))
+			string = parse_string(value, &place_to_save->text);
 		else
-			ft_err_handler("Scene broken!", 0, 0, 1);
-		skip_extra(&string);
+			ft_err_handler("Unknown figure property", 0, 0, 1);
+		skip_comma(&string);
+		free(name);
+		free(value);
 	}
-	// validate_figure(figure, type);
+	skip_close_brace(&string);
 	return (string);
 }
 
@@ -357,7 +293,7 @@ int		count_objects(char *string)
 	int	end;
 
 	count = 0;
-	while (*string)
+	while (*string && *string != ']')
 	{
 		if ((end = get_object_end(string)) == -1)
 			break ;
@@ -370,100 +306,123 @@ int		count_objects(char *string)
 char	*parse_figure_array(char *string, t_scene *place_to_save)
 {
 	int	i;
-	int	end;
 
 	place_to_save->objs_c = count_objects(string);
 	!(place_to_save->objs_h = malloc(sizeof(t_obj) * (place_to_save->objs_c + 1)))
 		? ft_err_handler("malloc", "can't allocate region!", 0, 1) : 0;
 	i = 0;
-	while (*string)
+	skip_open_bracket(&string);
+	while (i < place_to_save->objs_c)
 	{
-		if (*string == ']')
-		{
-			skip_extra(&string);
-			break;
-		}
-		end = get_object_end(string);
-		string = parse_figure(ft_strsub(string, 0, end), &place_to_save->objs_h[i]);
-		string = ft_strsub(string, end, ft_strlen(string) - end);
+		string = parse_figure(string, &place_to_save->objs_h[i]);
+		skip_comma(&string);
 		i++;
 	}
+	skip_close_bracket(&string);
+	place_to_save->objs_h[place_to_save->objs_c].type = -1;
 	return (string);
 }
 
-char	*parse_scene(char *string, t_env *place_to_save)
+char	get_light_type(char *string)
+{
+	if (!ft_strcmp(string, "\"ambient\""))
+		return (0);
+	if (!ft_strcmp(string, "\"point\""))
+		return (1);
+	ft_err_handler("Unknown light type!", 0, 0, 1);
+	return (2);
+}
+
+char	*parse_light_type(char *string, char *place_to_save)
+{
+	int		end;
+
+	end = get_primitive_end(string);
+	*place_to_save = get_light_type(ft_strsub(string, 0, end));
+	return (ft_strsub(string, end, ft_strlen(string) - end));
+}
+
+char	*parse_light(char *string, t_light *place_to_save)
+{
+	char	*name;
+	char	*value;
+
+	skip_open_brace(&string);
+	while (*string && *string != '}') {
+		name = get_name(string);
+		value = get_value(string);
+		if (!ft_strcmp(name, "\"type\""))
+			string = parse_light_type(value, &place_to_save->type);
+		else if (!ft_strcmp(name, "\"power\""))
+			string = parse_ufloat(value, &place_to_save->intens);
+		else if (!ft_strcmp(name, "\"position\""))
+			string = parse_cl_float3(value, &place_to_save->pos);
+		else
+			ft_err_handler("Unknown light property", 0, 0, 1);
+		skip_comma(&string);
+		free(name);
+		free(value);
+	}
+	skip_close_brace(&string);
+	return (string);
+}
+
+char	*parse_light_array(char *string, t_scene *place_to_save)
+{
+	int	i;
+
+	place_to_save->light_c = count_objects(string);
+	!(place_to_save->light_h = malloc(sizeof(t_light) * (place_to_save->light_c + 1)))
+		? ft_err_handler("malloc", "can't allocate region!", 0, 1) : 0;
+	i = 0;
+	skip_open_bracket(&string);
+	while (i < place_to_save->light_c)
+	{
+		string = parse_light(string, &place_to_save->light_h[i]);
+		i++;
+		skip_comma(&string);
+	}
+	skip_close_bracket(&string);
+	place_to_save->light_h[place_to_save->light_c].type = -1;
+	return (string);
+}
+
+void	parse_scene(char *string, t_env *env)
 {
 	char	*name;
 	char	*value;
 	
-	while (*string)
+	skip_open_brace(&string);
+	while (*string && *string != '}')
 	{
-		if (*string == '}')
-		{
-			skip_extra(&string);
-			break;
-		}
-		skip_extra(&string);
 		name = get_name(string);
 		value = get_value(string);
-		ft_printf("name = %s\n", name);
-		ft_printf("value = %s\n", value);
 		if (!ft_strcmp(name, "\"camera\""))
-		{
-			ft_printf("env = %p,\ncam = %p\n", place_to_save, place_to_save->cam);
-			string = parse_camera(value, place_to_save->cam);
-		}
+			string = parse_camera(value, env->cam);
 		else if (!ft_strcmp(name, "\"figures\""))
-			string = parse_figure_array(value, &place_to_save->scene);
-		// else if (!ft_strcmp(name_name_value[0], "lights"))
-		// 	string = parse_light(value, place_to_save->scene->light_h);
+			string = parse_figure_array(value, &env->scene);
+		else if (!ft_strcmp(name, "\"lights\""))
+			string = parse_light_array(value, &env->scene);
 		else
-			ft_err_handler("Scene broken!", 0, 0, 1);
+			ft_err_handler("Unknown scene property", 0, 0, 1);
+		skip_comma(&string);
 		free(name);
 		free(value);
 	}
-	return (string);
-}
-
-char	*parse_light(char *string, void *place_to_save)
-{
-// 	char	**name_name;
-
-// 	while (*string) {
-// 		name_name = ft_strsplit(string, ":");
-// 		if (count_split(name_name) != 2)
-// 			ft_err_handler("Scene broken!", 0, 0, 1);
-// 		if (!ft_strcmp(name_name[0], "type")))
-// 			string = get_object_or_array_string(name_value[1], "string", place_to_save);
-// 		else if (!ft_strcmp(name_name[0], "power")))
-// 			string = get_object_or_array_string(name_value[1], "double", place_to_save);
-// 		else if (!ft_strcmp(name_name[0], "position"))
-// 			string = get_object_or_array_string(name_value[1], "point", place_to_save);
-// 		else if (!ft_strcmp(name_name[0], "direction"))
-// 			string = get_object_or_array_string(name_value[1], "point", place_to_save);
-// 		else
-// 			ft_err_handler("Scene broken!", 0, 0, 1);
-// 		skip_extra(string);
-// 	}
-// 	validate_light(figure, type);
-	return NULL;
-}
-
-void	parse(char *string, t_env *env)
-{
-	if (string[0] != '{')
-		ft_err_handler("Scene broken!", 0, 0, 1);
-	ft_printf("env = %p\n", env);
-	parse_scene(string, env);
+	skip_close_brace(&string);
 }
 
 int		count_whitespaces(char *string)
 {
+	int	quote;
 	int	count;
 
+	quote = 0;
 	count = 0;
 	while (*string) {
-		if (*string == ' ' || *string == '\t' || *string == '\n')
+		if (*string == '"')
+			quote ^= 1;
+		if ((*string == ' ' || *string == '\t' || *string == '\n') && quote)
 			count++;
 		string++;
 	}
@@ -473,13 +432,17 @@ int		count_whitespaces(char *string)
 char	*remove_whitespaces(char *string)
 {
 	char	*result;
+	int		quote;
 	int		i;
 
 	result = (char *)malloc(ft_strlen(string) - count_whitespaces(string) + 1);
+	quote = 0;
 	i = 0;
 	while (*string)
 	{
-		if (*string != ' ' && *string != '\t' && *string != '\n') {
+		if (*string == '"')
+			quote ^= 1;
+		if ((*string != ' ' && *string != '\t' && *string != '\n') || quote) {
 			result[i] = *string;
 			i++;
 		}
@@ -507,5 +470,5 @@ void	read_scene(char *name, t_env *env)
 		free(temp);
 		free(line);
 	}
-	parse(remove_whitespaces(result), env);
+	parse_scene(remove_whitespaces(result), env);
 }

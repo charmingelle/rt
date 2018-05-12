@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: cozzmonavt <cozzmonavt@student.42.fr>      +#+  +:+       +#+         #
+#    By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/12/10 17:05:19 by pgritsen          #+#    #+#              #
-#    Updated: 2018/03/10 15:28:27 by cozzmonavt       ###   ########.fr        #
+#    Updated: 2018/05/12 14:28:56 by grevenko         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,9 +17,11 @@ CC			=	gcc
 OS			=	$(shell uname)
 
 ifeq ($(OS), Linux)
-	CFLAGS		=	-Wextra -Wall -O3 -g3
+	# CFLAGS		=	-Wextra -Wall -O3 -g3
+	CFLAGS		=	-O3 -g3
 else
-	CFLAGS		=	-Wextra -Werror -Wall -O3 -g3
+	# CFLAGS		=	-Wextra -Werror -Wall -O3 -g3
+	CFLAGS		=	-O3 -g3	
 endif
 
 HDRS		=	sgl.h sgl_private.h

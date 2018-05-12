@@ -3,14 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/23 14:16:00 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/10 14:14:45 by grevenko         ###   ########.fr       */
+/*   Updated: 2018/05/12 14:15:53 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "rt.h"
+
+cl_float3	tofloat3(t_point point)
+{
+	cl_float3	tmp;
+
+	tmp.x = (float)point.x;
+	tmp.y = (float)point.y;
+	tmp.z = (float)point.z;
+	return (tmp);
+}
 
 inline void	display_usage(t_uchar help)
 {
@@ -32,38 +42,35 @@ inline void	display_usage(t_uchar help)
 	exit(0);
 }
 
-inline void	camera_rotate(t_env *env)
-{
-	env->cam->rot.ry = (int)(env->cam->rot.ry + 1) % 360;
-	env->cam->pos.x = env->cam->rot_os * sin(ft_degtorad(env->cam->rot.ry));
-	env->cam->pos.z = -(env->cam->rot_os * cos(ft_degtorad(env->cam->rot.ry)));
-}
-
 void		resize_viewport(t_viewport *vwp, int width, int height)
 {
 	if (width > height)
 	{
-		vwp->h = 1.0;
-		vwp->w = (double)width / height;
+		vwp->vw_height = 1.0;
+		vwp->vw_width = (double)width / height;
 	}
 	else
 	{
-		vwp->w = 1.0;
-		vwp->h = (double)height / width;
+		vwp->vw_width = 1.0;
+		vwp->vw_height = (double)height / width;
 	}
+	vwp->wd_width = width;
+	vwp->wd_height = height;
 }
 
-void		init_env(t_env *e)
+void		init_env(t_env *env)
 {
-	ft_bzero(e, sizeof(t_env));
-	e->win = sgl_new_window(PROGRAM_NAME, W_WIDTH, W_HEIGHT,
+	srand(time(NULL));
+	ft_bzero(env, sizeof(t_env));
+	env->win = sgl_new_window(PROGRAM_NAME, W_WIDTH, W_HEIGHT,
 								SDL_WINDOW_RESIZABLE);
-	e->cam = ft_memalloc(sizeof(t_cam));
-	e->cam->vwp = ft_memalloc(sizeof(t_viewport));
-	resize_viewport(e->cam->vwp, e->win->w, e->win->h);
-	e->cam->vwp->dist = 1;
-	cl_init(&e->cl, CL_DEVICE_TYPE_GPU);
-	cl_parse_kernel(&e->cl, &e->cam->kl,
+	env->cam = ft_memalloc(sizeof(t_cam));
+	env->cam->vwp = ft_memalloc(sizeof(t_viewport));
+	resize_viewport(env->cam->vwp, env->win->w, env->win->h);
+	env->cam->vwp->dist = 1;
+	cl_init(&env->cl, CL_DEVICE_TYPE_GPU);
+	cl_parse_kernel(&env->cl, &env->cam->kl,
 		KERNEL_FOLDER"render.cl", "render_scene");
-	cl_reinit_mem(&e->cl, &e->cam->kl.mem, e->win->surf->pitch * e->win->h, 0);
+	cl_reinit_mem(&env->cl, &env->cam->kl.mem,
+		sizeof(cl_float3) * env->win->w * env->win->h, 0);
 }

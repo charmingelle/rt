@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+         #
+#    By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/12/10 17:05:19 by pgritsen          #+#    #+#              #
-#    Updated: 2018/05/08 11:48:55 by grevenko         ###   ########.fr        #
+#    Updated: 2018/05/12 14:19:54 by pgritsen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,12 +26,12 @@ endif
 
 HDRSDIR		=	./includes
 
-HDRS		=	$(addprefix $(HDRSDIR)/, rtv1.h structures.h)
+HDRS		=	$(addprefix $(HDRSDIR)/, rt.h structures.h)
 
 SRCSDIR		=	./sources
 
-SRCS		=	main.c events.c fps.c utils.c draw.c opencl.c sys_handler.c		\
-				cleaner.c	\
+SRCS		=	main.c events.c stats.c utils.c draw.c opencl.c sys_handler.c		\
+				cleaner.c movement.c vec.c											\
 				ann_scene.c
 				# scene.c
 

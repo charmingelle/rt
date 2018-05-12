@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   opencl.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cozzmonavt <cozzmonavt@student.42.fr>      +#+  +:+       +#+        */
+/*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/26 21:20:01 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/03/10 16:13:46 by cozzmonavt       ###   ########.fr       */
+/*   Updated: 2018/05/12 12:09:29 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "rtv1.h"
+#include "rt.h"
 
 static void	build_debug(t_cl_core *cl, t_cl_kl *kl)
 {
@@ -56,6 +56,7 @@ void		cl_init(t_cl_core *cl, cl_device_type dev_type)
 			break ;
 	err ? err = clGetDeviceIDs(p_ids[0], CL_DEVICE_TYPE_DEFAULT,
 			1, &cl->device, NULL) : 0;
+	free(p_ids);
 	err ? ft_err_handler("OpenCl", "Can't get device!", 0, 1) : 0;
 	cl->context = clCreateContext(0, 1, &cl->device, NULL, NULL, &err);
 	err ? ft_err_handler("OpenCl", "Can't create context!", 0, 1) : 0;

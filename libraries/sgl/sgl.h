@@ -6,7 +6,7 @@
 /*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/05 17:31:29 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/03/13 16:19:34 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/12 14:19:03 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ typedef struct	s_window
 
 void			sgl_init(void);
 
-int				sgl_quit(void);
+int				sgl_quit(void (*callback)(), void *data);
 
 void			sgl_plot_rend(t_point p, t_uint color, SDL_Renderer *rend);
 

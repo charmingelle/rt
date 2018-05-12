@@ -1,14 +1,14 @@
 {
 	"camera": {
 		"position": {
-			"x": 0,
-			"y": 0,
-			"z": 0
+			"x": 1,
+			"y": 2,
+			"z": 3
 		},
 		"angles": {
-			"x": 0,
-			"y": 0,
-			"z": 0
+			"x": 4,
+			"y": 5,
+			"z": 6
 		},
 		"distance": 1
 	},
@@ -20,8 +20,17 @@
 				"y": -180,
 				"z": 1100
 			},
+			"emission": {
+				"x": 1,
+				"y": 2,
+				"z": 3
+			},
 			"radius": 170,
-			"color": "679327",
+			"color": {
+				"x": 255,
+				"y": 0,
+				"z": 0
+			},
 			"texture": "./resources/images/icon.png",
 			"shine": 0,
 			"reflection": 0,
@@ -39,8 +48,21 @@
 				"y": 350,
 				"z": 1500
 			},
+			"emission": {
+				"x": 1,
+				"y": 2,
+				"z": 3
+			},
 			"radius": 150,
-			"color": "D8C077"
+			"color": {
+				"x": 0,
+				"y": 255,
+				"z": 0
+			},
+			"texture": "./resources/images/icon  hello.png",
+			"shine": 0,
+			"reflection": 0,
+			"transparency": 0
 		},
 		{
 			"type": "cone",
@@ -54,8 +76,21 @@
 				"y": 350,
 				"z": 1100
 			},
+			"emission": {
+				"x": 1,
+				"y": 2,
+				"z": 3
+			},
 			"angle": 20,
-			"color": "00FF00"
+			"color": {
+				"x": 0,
+				"y": 0,
+				"z": 255
+			},
+			"texture": "./resources/images/icon.png",
+			"shine": 0,
+			"reflection": 0,
+			"transparency": 0
 		},
 		{
 			"type": "plane",
@@ -69,7 +104,20 @@
 				"y": 1,
 				"z": 0
 			},
-			"color": "AADA64"
+			"emission": {
+				"x": 1,
+				"y": 2,
+				"z": 3
+			},
+			"color": {
+				"x": 255,
+				"y": 255,
+				"z": 255
+			},
+			"texture": "./resources/images/icon.png",
+			"shine": 0,
+			"reflection": 0,
+			"transparency": 0
 		}
 	],
 	"lights": [
@@ -79,25 +127,11 @@
 		},
 		{
 			"type": "point",
-			"power": 50,
+			"power": 80,
 			"position": {
 				"x": -350,
 				"y": 350,
-				"z": 700
-			}
-		},
-		{
-			"type": "directional",
-			"power": 30,
-			"position": {
-				"x": -350,
-				"y": 350,
-				"z": 700
-			},
-			"direction": {
-				"x": -1,
-				"y": -2,
-				"z": 1
+				"z": 700.99
 			}
 		}
 	]

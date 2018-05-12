@@ -6,7 +6,7 @@
 /*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/09 17:01:23 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/02/09 17:19:56 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/10 20:41:03 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,10 @@ inline static void	destroy_fonts(void)
 	ft_memdel((void **)&g_font_list);
 }
 
-int					sgl_quit(void)
+int					sgl_quit(void (*callback)(), void *data)
 {
+	if (callback)
+		callback(data);
 	destroy_wins();
 	destroy_fonts();
 	Mix_Quit();
