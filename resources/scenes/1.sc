@@ -1,13 +1,59 @@
-6 5
-[{0; 3; 12}, {0; 180; 0}, 12]
-object [2, 0000FF, {0; 0; 0}, {0; 4; 0}, 65, 10, 0.5]
-object [2, 0000FF, {0; 8; 0}, {0; 4; 0}, 65, 10, 0.5]
-object [0, FF00FF, {5; 4; 5}, {0; 0; 0}, 1, 10, 0.1]
-object [0, FF00FF, {-5; 3; 5}, {0; 0; 0}, 1, 10, 0.1]
-object [0, FF00FF, {5; 5; -5}, {0; 0; 0}, 1, 10, 0.1]
-object [0, FF00FF, {-5; 4; -5}, {0; 0; 0}, 1, 10, 0.1]
-light [0, 0.2, {0; 0; 0}]
-light [1, 0.2, {8; 4; 8}]
-light [1, 0.2, {-8; 4; 8}]
-light [1, 0.2, {8; 4; -8}]
-light [1, 0.2, {-8; 4; -8}]
+{
+	"camera": {
+		"position": [0, 2, -7],
+		"angles": [0, 0, 0]
+	},
+	"figures": [
+		{
+			"type": "sphere",
+			"center": [0, 5.5, 0],
+			"radius": 1,
+			"color": [1, 0, 0],
+			"emission": [20, 20, 20],
+			"material": "emissive"
+		},
+		{
+			"type": "cylinder",
+			"center": [1.8, 0, 0],
+			"center2": [1.8, 3, 0],
+			"radius": 1,
+			"color": [1, 1, 1],
+			"material": "diffuse"
+		},
+		{
+			"type": "plane",
+			"center": [0, 5, 0],
+			"center2": [0, -1, 0],
+			"color": [0.9, 0.67, 0.44],
+			"material": "diffuse"
+		},
+		{
+			"type": "plane",
+			"center": [0, 0, 0],
+			"center2": [0, 1, 0],
+			"color": [0.9, 0.67, 0.44],
+			"material": "diffuse"
+		},
+		{
+			"type": "plane",
+			"center": [0, 0, 2],
+			"center2": [0, 0, 1],
+			"color": [0.9, 0.67, 0.44],
+			"material": "diffuse"
+		},
+		{
+			"type": "plane",
+			"center": [-3, 0, 0],
+			"center2": [1, 0, 0],
+			"color": [0.5, 0.1, 0],
+			"material": "diffuse"
+		},
+		{
+			"type": "plane",
+			"center": [3, 0, 0],
+			"center2": [1, 0, 0],
+			"color": [0, 0.1, 0.5],
+			"material": "diffuse"
+		}
+	]
+}

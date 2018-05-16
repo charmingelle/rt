@@ -6,7 +6,7 @@
 #    By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/12/10 17:05:19 by pgritsen          #+#    #+#              #
-#    Updated: 2018/05/12 14:19:54 by pgritsen         ###   ########.fr        #
+#    Updated: 2018/05/15 19:22:28 by pgritsen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,11 +17,9 @@ CC			=	gcc
 OS			=	$(shell uname)
 
 ifeq ($(OS), Linux)
-	# CFLAGS		=	-Wextra -Wall -O3 -g3
-	CFLAGS		=	-O3 -g3
+	CFLAGS		=	-Wextra -Wall -O3 -g3
 else
-	# CFLAGS		=	-Wextra -Werror -Wall -O3 -g3
-	CFLAGS		=	-O3 -g3
+	CFLAGS		=	-Wextra -Werror -Wall -O3 -g3
 endif
 
 HDRSDIR		=	./includes
@@ -30,10 +28,9 @@ HDRS		=	$(addprefix $(HDRSDIR)/, rt.h structures.h)
 
 SRCSDIR		=	./sources
 
-SRCS		=	main.c events.c stats.c utils.c draw.c opencl.c sys_handler.c		\
-				cleaner.c movement.c vec.c											\
-				ann_scene.c
-				# scene.c
+SRCS		=	main.c events.c stats.c utils_1.c utils_2.c draw.c opencl.c		\
+				sys_handler.c movement.c vec.c scene_1.c scene_2.c scene_3.c	\
+				obj_info.c
 
 OBJDIR		=	./obj
 

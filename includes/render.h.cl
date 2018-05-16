@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   render.h.cl                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/24 13:16:51 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/02/24 13:19:46 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/16 18:33:04 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,13 @@
 # define CYLINDER 1
 # define CONE 2
 # define PLANE 3
+# define ELLIPSOID 4
+# define PARABOLID 5
+# define HYPERBOLOID 6
+# define DISC 7
+# define CUBE 8
+# define TORUS 9
+# define MEBIUS 10
 
 # define SMOOTH_LEVEL 1
 # define BOUNCE_DEPTH 4
@@ -63,19 +70,23 @@ float		fix_limits(float3 O, float3 D, float3 Va, t_obj obj, float ints);
 
 /*-------------------------------INTERSECTIONS--------------------------------*/
 
+
 float2		intersect_ray_plane(float3 O, float3 D, t_obj obj);
 float2		intersect_ray_cylinder(float3 O, float3 D, t_obj obj);
 float2		intersect_ray_cone(float3 O, float3 D, t_obj obj);
 float2		intersect_ray_sphere(float3 O, float3 D, t_obj obj);
+float2		intersect_ray_ellipsoid(float3 O, float3 D, t_obj obj);
+float2		intersect_ray_parabolid(float3 O, float3 D, t_obj obj);
+float2		intersect_ray_hyperboloid(float3 O, float3 D, t_obj obj);
+float2		intersect_ray_disc(float3 O, float3 D, t_obj obj);
+float2		intersect_ray_cube(float3 O, float3 D, t_obj obj);
 float2		choose_intersection(float3 O, float3 D, t_obj obj, int type);
 t_obj_data	closest_intersection(float3 O, float3 D, __constant t_obj *objs);
 
-/*-----------------------------------LIGHT------------------------------------*/
+double		solve_quartic(double a, double b, double c, double l, double e);
+float2		intersect_ray_torus(float3 O, float3 D, t_obj obj);
 
-float		compute_lighting(float3 P, float3 N, float3 O, float3 V, int s,
-							__constant t_light *light, __constant t_obj *objs);
-
-/*---------------------------------RAYTRACING---------------------------------*/
+/*--------------------------------PATHTRACING---------------------------------*/
 
 float3		trace_ray(float3 O, float3 D, __constant t_obj *objs, uint *seed0, uint *seed1);
 

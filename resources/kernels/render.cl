@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   render.cl                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/23 14:32:50 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/02/23 20:34:48 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/16 19:14:27 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,9 +87,11 @@ float3			calc_normal(float3 P, float3 D, t_obj obj)
 {
 	float3		N;
 	float3		T;
+	float3		Q;
+	float		q_coef;
 
 	N = P - obj.pos;
-	if (obj.type == PLANE)
+	if (obj.type == PLANE || obj.type == DISC)
 		return (obj.dir / fast_length(obj.dir));
 	else if (obj.type == CYLINDER || obj.type == CONE)
 	{
@@ -102,6 +104,67 @@ float3			calc_normal(float3 P, float3 D, t_obj obj)
 	}
 	else if (obj.type == SPHERE)
 		N /= fast_length(N);
+	else if (obj.type == CUBE)
+	{
+		float3 N_[6];
+		float NP[6];
+		//front side
+		float3	P1 = {obj.pos.x, obj.pos.y, obj.pos.z};
+		float3	P2 = {obj.pos.x, obj.pos.y + obj.rad, obj.pos.z};
+		float3	P3 = {obj.pos.x + obj.rad, obj.pos.y + obj.rad, obj.pos.z};
+		N_[0] = cross(P2 - P1, P3 - P1);
+		NP[0] = dot(N_[0], P - P1);
+		//back side
+		N_[1] = cross(P3 - P1, P2 - P1);
+		P1 = (float3){obj.dir.x, obj.dir.y, obj.dir.z};
+		NP[1] = dot(N_[1], P - P1);
+		//left side
+		P1 = (float3){obj.dir.x, obj.dir.y, obj.dir.z};
+		P2 = (float3){obj.dir.x, obj.dir.y + obj.rad, obj.dir.z};
+		P3 = (float3){obj.pos.x, obj.pos.y, obj.pos.z};
+		N_[2] = cross(P2 - P1, P3 - P1);
+		NP[2] = dot(N_[2], P - P1);
+		//right side
+		N_[3] = cross(P3 - P1, P2 - P1);
+		P1 = (float3){obj.dir.x + obj.rad, obj.dir.y, obj.dir.z};
+		NP[3] = dot(N_[3], P - P1);
+		//down side
+		P1 = (float3){obj.dir.x, obj.dir.y, obj.dir.z};
+		P2 = (float3){obj.dir.x + obj.rad, obj.dir.y, obj.dir.z};
+		P3 = (float3){obj.pos.x, obj.pos.y, obj.pos.z};
+		N_[4] = cross(P2 - P1, P3 - P1);
+		NP[4] = dot(N_[4], P - P1);
+		//up side
+		N_[5] = cross(P3 - P1, P2 - P1);
+		P1 = (float3){obj.dir.x, obj.dir.y + obj.rad, obj.dir.z};
+		NP[5] = dot(N_[5], P - P1);
+
+		int i  = -1;
+		while (++i < 6)
+			if (NP[i] > -EPSILON && NP[i] <= EPSILON)
+				break;
+		N = fast_normalize(N_[i]);
+		return (N);
+	}
+	else if (obj.type == ELLIPSOID
+		|| obj.type == PARABOLID
+		|| obj.type == HYPERBOLOID)
+	{
+		float3 coeff = {3.0F, 1.5F, 5.0F};
+		N.x = 2.0F * N.x / coeff.x;
+		N.y = 2.0F * N.y / coeff.y;
+		N.z = 2.0F * N.z / coeff.z;
+		N = fast_normalize(N);
+		return (N);
+	}
+	else if (obj.type == TORUS)
+	{
+		q_coef = obj.rad / (P.x * P.x + P.y * P.y);
+		Q.x = q_coef * P.x;
+		Q.y = q_coef * P.y;
+		Q.z = 0;
+		return (P - Q);
+	}
 	return (N);
 }
 
@@ -221,6 +284,245 @@ float2			intersect_ray_sphere(float3 O, float3 D, t_obj obj)
 		(-k2 + sqrt(descr)) / (2.0F * k1)});
 }
 
+double	solve_quartic(double a, double b, double c, double l, double e)
+{
+	double	j,k,p,q,z;
+	int		u, v, g;
+	double	*r;
+	double	x;
+	int		i;
+
+	r = (double *)malloc(sizeof(double) * 8);
+
+	b /= a;
+	c /= a;
+	l /= a;
+	e /= a;
+	j = 3 * b;
+	k = 2 * c;
+	p = (12 * k - j * j) / 48;
+	q = (2 * j * j * j - 36 * j * k + 432 * l) / 1728;
+	z = q * q / 4 + p * p * p /27;
+
+	u = 0;
+	v = 0;
+	for(g = 1; g < 4; g++)
+	{
+		r[g] = z > 0 | p == 0 ? cbrt(-q / 2 + sqrt(z)) + cbrt(-q / 2 - sqrt(z)) - j / 12 : sqrt(-p / .75) * cos(acos(-q / sqrt(-p * p * p * 4 / 27)) / 3 - g * acos(-.5)) -j / 12;
+		r[g + 4] = (r[g] + b) * pow(r[g], 3) + c * r[g] * r[g] + l * r[g] + e;
+		if (r[g + 4] > r[g + 3] | g == 1)
+			u = g;
+		if (r[g + 4] < r[g + 3] | g == 1)
+			v = g;
+	}
+	if(r[v + 4] > 0)
+		x = 0;
+	if(r[v + 4] == 0)
+		x = r[v];
+	if(r[v + 4] < 0)
+	{
+		i = -1;
+		x = 2 * r[v] - r[u] + (r[v] - r[u] == 0);
+		while (++i < 99)
+			x = x - ((x + b) * x * x * x + c * x * x + l * x + e) / (4 * x * x * x + j * x * x + k * x + l);
+	}
+	return (x);
+}
+
+float2			intersect_ray_torus(float3 O, float3 D, t_obj obj)
+{
+	float	a;
+	float	b;
+	float	c;
+	float	d;
+	float	e;
+	float	result;
+	float	G;
+	float	H;
+	float	I;
+	float	J;
+	float	K;
+	float	L;
+
+	G = 4 * obj.rad * obj.rad * (O.x * O.x + O.y * O.y);
+	H = 8 * obj.rad * obj.rad * (D.x * O.x + D.y * O.y);
+	I = 4 * obj.rad * obj.rad * (D.x * D.x + D.y * D.y);
+	J = O.x * O.x + O.y * O.y + O.z * O.z;
+	K = 2 * (D.x * O.x + D.y * O.y + D.z * O.z);
+	L = (D.x * D.x + D.y * D.y + D.z * D.z) + (obj.rad * obj.rad) − (obj.rad2 * obj.rad2);
+
+	a = J * J;
+	b = 2 * J * K;
+	c = (2 * J * L) + (K * K) − G;
+	d = (2 * K * L) − H;
+	e = (L * L) − I;
+	result = solve_quartic(a, b, c, d, e);
+	return (float2){result, result};
+}
+
+float2			intersect_ray_ellipsoid(float3 O, float3 D, t_obj obj)
+{
+	float	descr;
+	float	k1;
+	float	k2;
+	float	k3;
+	float3	OC;
+
+	OC = O - obj.pos;
+	float3 coeff = {3.0F, 1.5F, 5.0F};
+	k1 = (D.x * D.x / coeff.x) + (D.y * D.y / coeff.y) + (D.z * D.z / coeff.z);
+	k2 = (2.0F * OC.x * D.x / coeff.x) + (2.0F * OC.y * D.y / coeff.y) + (2.0F * OC.z * D.z / coeff.z);
+	k3 =  (OC.x * OC.x / coeff.x) + (OC.y * OC.y / coeff.y) + (OC.z * OC.z / coeff.z) - obj.rad * obj.rad;
+
+	descr = k2 * k2 - 4.0F * k1 * k3;
+	if (descr < 0)
+		return ((float2){INFINITY, INFINITY});
+	return ((float2){
+		(-k2 + sqrt(descr)) / (2.0F * k1),
+		(-k2 - sqrt(descr)) / (2.0F * k1)});
+}
+
+float2			intersect_ray_parabolid(float3 O, float3 D, t_obj obj)
+{
+	float	descr;
+	float	k1;
+	float	k2;
+	float	k3;
+	float2	T;
+	float3	OC;
+	float3	Va = (obj.dir - obj.pos) / fast_length(obj.dir - obj.pos);
+
+	OC = O - obj.pos;
+	float3 coeff = {3.0F, 1.5F, 5.0F};
+	k1 = (D.x * D.x / coeff.x) + (D.z * D.z / coeff.z);
+	k2 = (2.0F * OC.x * D.x / coeff.x) + (2.0F * OC.z * D.z / coeff.z) - D.y;
+	k3 =  (OC.x * OC.x / coeff.x) + (OC.z * OC.z / coeff.z) - OC.y * 2.0F;
+
+	descr = k2 * k2 - 4.0F * k1 * k3;
+	if (descr < 0)
+		return ((float2){INFINITY, INFINITY});
+	T = (float2){
+		(-k2 + sqrt(descr)) / (2.0F * k1),
+		(-k2 - sqrt(descr)) / (2.0F * k1)};
+	T.x = fix_limits(O, D, Va, obj, T.x);
+	T.y = fix_limits(O, D, Va, obj, T.y);
+	return (T);
+}
+
+float2			intersect_ray_hyperboloid(float3 O, float3 D, t_obj obj)
+{
+	float	descr;
+	float	k1;
+	float	k2;
+	float	k3;
+	float2	T;
+	float3	OC;
+	float3	Va = (obj.dir - obj.pos) / fast_length(obj.dir - obj.pos);
+
+	OC = O - obj.dir;
+	float3 coeff = {3.0F, 1.5F, 5.0F};
+	k1 = (D.x * D.x / coeff.x) - (D.y * D.y / coeff.y) + (D.z * D.z / coeff.z);
+	k2 = (2.0F * OC.x * D.x / coeff.x) - (2.0F * OC.y * D.y / coeff.y) + (2.0F * OC.z * D.z / coeff.z);
+	k3 =  (OC.x * OC.x / coeff.x) - (OC.y * OC.y / coeff.y) + (OC.z * OC.z / coeff.z) - obj.rad;
+
+	descr = k2 * k2 - 4.0F * k1 * k3;
+	if (descr < 0)
+		return ((float2){INFINITY, INFINITY});
+	T = (float2){
+		(-k2 + sqrt(descr)) / (2.0F * k1),
+		(-k2 - sqrt(descr)) / (2.0F * k1)};
+	T.x = fix_limits(O, D, Va, obj, T.x);
+	T.y = fix_limits(O, D, Va, obj, T.y);
+	return (T);
+}
+
+float2			intersect_ray_disc(float3 O, float3 D, t_obj obj)
+{
+	float2	T = intersect_ray_plane(O, D, obj);
+
+	if (T.x != INFINITY)
+	{
+		float3	P = O + D * T.x;
+		float3	PC = P - obj.dir;
+		float	k = dot(PC, PC);
+        if (k <= obj.rad * obj.rad)
+			return ((float2){T.x, INFINITY});
+	}
+	return ((float2){INFINITY, INFINITY});
+}
+
+inline static float	intersect_ray_rectangle(float3 P1, float3 P2, float3 P3, float3 P4, float3 O, float3 D)
+{
+	float3	Q = cross(P2 - P1, P4 - P1);
+	float	F = -P1.x * (P2.y * P3.z - P3.y * P2.z) - P2.x * (P3.y * P1.z - P1.y * P3.z) - P3.x * (P1.y * P2.z - P2.y * P1.z);
+
+	float	T = -(Q.x * O.x + Q.y * O.y + Q.z * O.z + F) / (Q.x * D.x + Q.y * D.y + Q.z * D.z);
+	if (T < -2.0F)
+		return (INFINITY);
+	float3	P = O + D * T;
+
+	float3	V1 = (P2 - P1) / fast_length(P2 - P1);
+	float3	V2 = (P4 - P3) / fast_length(P4 - P3);
+	float3	V3 = (P - P1) / fast_length(P - P1);
+	float3	V4 = (P - P3) / fast_length(P - P3);
+
+	float3	V5 = (P1 - P4) / fast_length(P1 - P4);
+	float3	V6 = (P3 - P2) / fast_length(P3 - P2);
+	float3	V7 = (P - P4) / fast_length(P - P4);
+	float3	V8 = (P - P2) / fast_length(P - P2);
+
+    if (dot(V1, V3) >= 0 && dot(V2, V4) >= 0 && dot(V5, V7) >= 0 && dot(V6, V8) >= 0)
+		return (T);
+	return (INFINITY);
+}
+
+float2			intersect_ray_cube(float3 O, float3 D, t_obj obj)
+{
+	//front
+	float3	P1 = {obj.pos.x, obj.pos.y, obj.pos.z};
+	float3	P2 = {obj.pos.x, obj.pos.y + obj.rad, obj.pos.z};
+	float3	P3 = {obj.pos.x + obj.rad, obj.pos.y + obj.rad, obj.pos.z};
+	float3	P4 = {obj.pos.x + obj.rad, obj.pos.y, obj.pos.z};
+	float T = intersect_ray_rectangle(P1, P2, P3, P4, O, D);
+	//back
+	P1 = (float3){obj.dir.x, obj.dir.y, obj.dir.z};
+	P2 = (float3){obj.dir.x, obj.dir.y + obj.rad, obj.dir.z};
+	P3 = (float3){obj.dir.x + obj.rad, obj.dir.y + obj.rad, obj.dir.z};
+	P4 = (float3){obj.dir.x + obj.rad, obj.dir.y, obj.dir.z};
+	float T1 = intersect_ray_rectangle(P1, P2, P3, P4, O, D);
+	T1 < T ? T = T1 : 0;
+	// //left
+	P1 = (float3){obj.dir.x, obj.dir.y, obj.dir.z};
+	P2 = (float3){obj.dir.x, obj.dir.y + obj.rad, obj.dir.z};
+	P3 = (float3){obj.pos.x, obj.pos.y + obj.rad, obj.pos.z};
+	P4 = (float3){obj.pos.x, obj.pos.y, obj.pos.z};
+	float T2 = intersect_ray_rectangle(P1, P2, P3, P4, O, D);
+	// //right
+	P1 = (float3){obj.dir.x + obj.rad, obj.dir.y, obj.dir.z};
+	P2 = (float3){obj.dir.x + obj.rad, obj.dir.y + obj.rad, obj.dir.z};
+	P3 = (float3){obj.pos.x + obj.rad, obj.pos.y + obj.rad, obj.pos.z};
+	P4 = (float3){obj.pos.x + obj.rad, obj.pos.y, obj.pos.z};
+	float T3 = intersect_ray_rectangle(P1, P2, P3, P4, O, D);
+	T3 < T2 ? T2 = T3 : 0;
+	// //down
+	P1 = (float3){obj.dir.x, obj.dir.y, obj.dir.z};
+	P2 = (float3){obj.dir.x + obj.rad, obj.dir.y, obj.dir.z};
+	P3 = (float3){obj.pos.x + obj.rad, obj.pos.y, obj.pos.z};
+	P4 = (float3){obj.pos.x, obj.pos.y, obj.pos.z};
+	float T4 = intersect_ray_rectangle(P1, P2, P3, P4, O, D);
+	// //up
+	P1 = (float3){obj.dir.x, obj.dir.y + obj.rad, obj.dir.z};
+	P2 = (float3){obj.dir.x + obj.rad, obj.dir.y + obj.rad, obj.dir.z};
+	P3 = (float3){obj.pos.x + obj.rad, obj.pos.y + obj.rad, obj.pos.z};
+	P4 = (float3){obj.pos.x, obj.pos.y + obj.rad, obj.pos.z};
+	float T5 = intersect_ray_rectangle(P1, P2, P3, P4, O, D);
+	T5 < T4 ? T4 = T5 : 0;
+
+	T2 < T ? T = T2 : 0;
+	T4 < T ? T = T4 : 0;
+	return ((float2)(T, INFINITY));
+}
+
 float2			choose_intersection(float3 O, float3 D, t_obj obj, int type)
 {
 	if (type == SPHERE)
@@ -231,6 +533,18 @@ float2			choose_intersection(float3 O, float3 D, t_obj obj, int type)
 		return (intersect_ray_cylinder(O, D, obj));
 	else if (type == CONE)
 		return (intersect_ray_cone(O, D, obj));
+	else if (type == ELLIPSOID)
+		return (intersect_ray_ellipsoid(O, D, obj));
+	else if (type == PARABOLID)
+		return (intersect_ray_parabolid(O, D, obj));
+	else if (type == HYPERBOLOID)
+		return (intersect_ray_hyperboloid(O, D, obj));
+	else if (type == DISC)
+		return (intersect_ray_disc(O, D, obj));
+	else if (type == CUBE)
+		return (intersect_ray_cube(O, D, obj));
+	else if (type == TORUS)
+		return (intersect_ray_torus(O, D, obj));
 	else
 		return ((float2){INFINITY, INFINITY});
 }
@@ -285,11 +599,10 @@ float3			trace_ray(float3 O, float3 D, __constant t_obj *objs, uint *seed0, uint
 		N = calc_normal(P, D, obj_data.obj);
 		N = dot(N, D) < 0.0F? N : N * (-1.0F);
 
-		if (obj_data.obj.refl)
+		if (obj_data.obj.material == REFLECT)
 		{
 			O = P + N * 0.01F;
 			D = reflect_ray(-D, N);
-			obj_data.obj.color *= obj_data.obj.refl;
 		}
 		else
 		{

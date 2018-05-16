@@ -6,7 +6,7 @@
 /*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/21 14:01:53 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/12 14:12:19 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/14 19:42:56 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,10 @@ static void	key_down_handler(SDL_Scancode key, t_env *env)
 	t_uchar	e;
 
 	e = 0;
-	key == SDL_SCANCODE_M ? env->flags ^= 0b1 : 0;
-	SDL_SetRelativeMouseMode(INTERACTIVE_M(env->flags));
-	INTERACTIVE_M(env->flags) ? handle_movement(key, env, 1) : 0;
+	key == SDL_SCANCODE_M ? env->flags.move_m ^= 0b1 : 0;
+	key == SDL_SCANCODE_P ? screenshot(env, "screenshot.ppm") : 0;
+	SDL_SetRelativeMouseMode(env->flags.move_m);
+	env->flags.move_m ? movement_keys(key, env, 1) : 0;
 	e ? init_scene(env) : 0;
 }
 
@@ -28,7 +29,7 @@ static void	key_up_handler(SDL_Scancode key, t_env *env)
 	t_uchar	e;
 
 	e = 0;
-	INTERACTIVE_M(env->flags) ? handle_movement(key, env, 0) : 0;
+	env->flags.move_m ? movement_keys(key, env, 0) : 0;
 	e ? init_scene(env) : 0;
 }
 
@@ -38,8 +39,10 @@ static void	mouse_move_handler(t_env *env)
 	int		y;
 
 	SDL_GetRelativeMouseState(&x, &y);
-	if (ABS(x) > 60 || ABS(y) > 60)
-		return ;
+	x > 60 ? x = 60 : 0;
+	x < -60 ? x = -60 : 0;
+	y > 60 ? y = 60 : 0;
+	y < -60 ? y = -60 : 0;
 	env->cam->rot.x -= (float)y * 0.3F;
 	env->cam->rot.y -= (float)x * 0.3F;
 	init_scene(env);
@@ -63,7 +66,7 @@ int			poll_events(t_env *env)
 			key_down_handler(e.key.keysym.scancode, env);
 		else if (e.type == SDL_KEYUP)
 			key_up_handler(e.key.keysym.scancode, env);
-		else if (e.type == SDL_MOUSEMOTION && INTERACTIVE_M(env->flags))
+		else if (e.type == SDL_MOUSEMOTION && env->flags.move_m)
 			mouse_move_handler(env);
 	return (1);
 }
