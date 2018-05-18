@@ -23,6 +23,4 @@ void	sgl_init(void)
 		s_err_handler("SDL_TTF", TTF_GetError(), 0, 1);
 	if (IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) < 0)
 		s_err_handler("SDL_IMG", IMG_GetError(), 0, 1);
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
-		s_err_handler("SDL_IMG", SDL_GetError(), 0, 1);
 }

@@ -6,7 +6,7 @@
 /*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/24 13:16:51 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/16 18:33:04 by grevenko         ###   ########.fr       */
+/*   Updated: 2018/05/18 19:22:39 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,24 @@ typedef struct	s_obj_data
 	float	closest_t;
 }				t_obj_data;
 
+typedef	struct			s_equation
+{
+	bool				flag;
+	float				aa;
+	float				pp;
+	float				rr;
+	float				q2;
+	float				c;
+	float				b;
+	float				br;
+	float				discr;
+	float				real1;
+	float				real2;
+	float				im1;
+	float				im2;
+	float2				l;
+}						t_equation;
+
 /*---------------------------------UTILITIES----------------------------------*/
 
 float3		reflect_ray(float3 R, float3 N);
@@ -83,9 +101,15 @@ float2		intersect_ray_cube(float3 O, float3 D, t_obj obj);
 float2		choose_intersection(float3 O, float3 D, t_obj obj, int type);
 t_obj_data	closest_intersection(float3 O, float3 D, __constant t_obj *objs);
 
-double		solve_quartic(double a, double b, double c, double l, double e);
+<<<<<<< HEAD
+float2		get_quadratic_solution(float a, float b, float c);
+float		get_canonic_cubic_solution(float p, float q);
+float		get_cubic_solution(float a, float b, float c, float d);
+float4		get_quartic_solution(float a, float b, float c, float d);
 float2		intersect_ray_torus(float3 O, float3 D, t_obj obj);
 
+=======
+>>>>>>> anna
 /*--------------------------------PATHTRACING---------------------------------*/
 
 float3		trace_ray(float3 O, float3 D, __constant t_obj *objs, uint *seed0, uint *seed1);

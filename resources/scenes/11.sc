@@ -9,14 +9,15 @@
 			"center": [0, 5.5, 0],
 			"radius": 1,
 			"color": [1, 0, 0],
-			"emission": [20, 20, 20],
+			"emission": [2, 2, 2],
 			"material": "emissive"
 		},
 		{
 			"type": "torus",
-			"center": [1.8, 0, 0],
+			"center": [0, 2, 0],
+			"normal": [0, 0, 1],
 			"radius": 1,
-			"radius2": 0.5
+			"radius2": 0.5,
 			"color": [1, 1, 1],
 			"material": "diffuse"
 		},

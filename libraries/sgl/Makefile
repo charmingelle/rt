@@ -17,11 +17,9 @@ CC			=	gcc
 OS			=	$(shell uname)
 
 ifeq ($(OS), Linux)
-	# CFLAGS		=	-Wextra -Wall -O3 -g3
-	CFLAGS		=	-O3 -g3
+	CFLAGS		=	-Wextra -Wall -O3 -g3
 else
-	# CFLAGS		=	-Wextra -Werror -Wall -O3 -g3
-	CFLAGS		=	-O3 -g3	
+	CFLAGS		=	-Wextra -Werror -Wall -O3 -g3
 endif
 
 HDRS		=	sgl.h sgl_private.h

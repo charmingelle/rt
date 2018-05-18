@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/02 20:32:42 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/15 19:37:21 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/18 15:46:27 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,3 +60,32 @@ inline void	free_splited(char **arr)
 		free(arr[i]);
 	free(arr);
 }
+
+// float		vlen(cl_float3 a)
+// {
+// 	return (sqrt(a.x * a.x + a.y * a.y + a.z * a.z));
+// }
+
+// cl_float3	vmult(cl_float3 a, float num)
+// {
+// 	cl_float3	res;
+
+// 	res.x = num * a.x;
+// 	res.y = num * a.y;
+// 	res.z = num * a.z;
+// 	return (res);
+// }
+
+// cl_float3	normalize(cl_float3 v)
+// {
+// 	float	len;
+// 	float	inv_len;
+
+// 	len = vlen(v);
+// 	if (len > 0)
+// 	{
+// 		inv_len = 1.0 / len;
+// 		return (vmult(v, inv_len));
+// 	}
+// 	return (v);
+// }

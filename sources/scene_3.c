@@ -6,7 +6,7 @@
 /*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/15 15:40:52 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/16 18:28:18 by grevenko         ###   ########.fr       */
+/*   Updated: 2018/05/18 19:23:06 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,12 @@ void		parse_figure(char **string, t_obj *p)
 	char		*name;
 	const char	*sys[] = {"\"type\"", "\"center\"", "\"center2\"", "\"normal\"",
 		"\"emission\"", "\"radius\"", "\"angle\"", "\"color\"", "\"material\"",
-		"\"texture\"", "\"radius2\""};
+		/*"\"texture\"", */"\"radius2\""};
 	const void	*data[] = {&p->type, &p->pos, &p->dir, &p->dir, &p->emission,
-		&p->rad, &p->rad, &p->color, &p->material, &p->text, &p->rad2};
+		&p->rad, &p->rad, &p->color, &p->material/*, &p->text*/, &p->rad2};
 	static void	(*func[])() = {parse_figure_type, parse_cl_float3,
 		parse_cl_float3, parse_cl_float3, parse_cl_float3, parse_float,
-		parse_float, parse_cl_float3, parse_material, parse_string, parse_float};
+		parse_float, parse_cl_float3, parse_material/*, parse_string*/, parse_float};
 
 	SOB(string);
 	while (**string && **string != '}' && (i = -1))

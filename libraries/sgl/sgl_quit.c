@@ -64,7 +64,6 @@ int					sgl_quit(void (*callback)(), void *data)
 		callback(data);
 	destroy_wins();
 	destroy_fonts();
-	Mix_Quit();
 	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();

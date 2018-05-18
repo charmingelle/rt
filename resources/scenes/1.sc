@@ -1,58 +1,150 @@
 {
 	"camera": {
-		"position": [0, 2, -7],
-		"angles": [0, 0, 0]
+		"position": {
+			"x": 0,
+			"y": 2,
+			"z": -7
+		},
+		"angles": {
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
 	},
 	"figures": [
 		{
 			"type": "sphere",
-			"center": [0, 5.5, 0],
+			"center": {
+				"x": 0,
+				"y": 5.5,
+				"z": 0
+			},
 			"radius": 1,
-			"color": [1, 0, 0],
-			"emission": [20, 20, 20],
+			"color": {
+				"x": 1,
+				"y": 0,
+				"z": 0
+			},
+			"emission": {
+				"x": 20,
+				"y": 20,
+				"z": 20
+			},
 			"material": "emissive"
 		},
 		{
 			"type": "cylinder",
-			"center": [1.8, 0, 0],
-			"center2": [1.8, 3, 0],
+			"center": {
+				"x": 1.8,
+				"y": 0,
+				"z": 0
+			},
+			"center2": {
+				"x": 1.8,
+				"y": 3,
+				"z": 0
+			},
 			"radius": 1,
-			"color": [1, 1, 1],
+			"color": {
+				"x": 1,
+				"y": 1,
+				"z": 1
+			},
 			"material": "diffuse"
 		},
 		{
 			"type": "plane",
-			"center": [0, 5, 0],
-			"center2": [0, -1, 0],
-			"color": [0.9, 0.67, 0.44],
+			"center": {
+				"x": 0,
+				"y": 5,
+				"z": 0
+			},
+			"center2": {
+				"x": 0,
+				"y": -1,
+				"z": 0
+			},
+			"color": {
+				"x": 0.9,
+				"y": 0.67,
+				"z": 0.44
+			},
 			"material": "diffuse"
 		},
 		{
 			"type": "plane",
-			"center": [0, 0, 0],
-			"center2": [0, 1, 0],
-			"color": [0.9, 0.67, 0.44],
+			"center": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"center2": {
+				"x": 0,
+				"y": 1,
+				"z": 0
+			},
+			"color": {
+				"x": 0.9,
+				"y": 0.67,
+				"z": 0.44
+			},
 			"material": "diffuse"
 		},
 		{
 			"type": "plane",
-			"center": [0, 0, 2],
-			"center2": [0, 0, 1],
-			"color": [0.9, 0.67, 0.44],
+			"center": {
+				"x": 0,
+				"y": 0,
+				"z": 2
+			},
+			"center2": {
+				"x": 0,
+				"y": 0,
+				"z": 1
+			},
+			"color": {
+				"x": 0.9,
+				"y": 0.67,
+				"z": 0.44
+			},
 			"material": "diffuse"
 		},
 		{
 			"type": "plane",
-			"center": [-3, 0, 0],
-			"center2": [1, 0, 0],
-			"color": [0.5, 0.1, 0],
+			"center": {
+				"x": -3,
+				"y": 0,
+				"z": 0
+			},
+			"center2": {
+				"x": 1,
+				"y": 0,
+				"z": 0
+			},
+			"color": {
+				"x": 0.5,
+				"y": 0.1,
+				"z": 0
+			},
 			"material": "diffuse"
 		},
 		{
 			"type": "plane",
-			"center": [3, 0, 0],
-			"center2": [1, 0, 0],
-			"color": [0, 0.1, 0.5],
+			"center": {
+				"x": 3,
+				"y": 0,
+				"z": 0
+			},
+			"center2": {
+				"x": 1,
+				"y": 0,
+				"z": 0
+			},
+			"color": {
+				"x": 0,
+				"y": 0.1,
+				"z": 0.5
+			},
 			"material": "diffuse"
 		}
 	]

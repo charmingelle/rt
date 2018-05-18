@@ -6,7 +6,7 @@
 /*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/24 13:21:23 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/16 14:53:52 by grevenko         ###   ########.fr       */
+/*   Updated: 2018/05/18 19:22:42 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ typedef struct	s_obj
 	float		rad;
 	float		rad2;
 	t_material	material;
-	char		*text;
 }				t_obj;
 
 typedef struct	s_viewport

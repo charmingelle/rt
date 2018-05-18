@@ -6,7 +6,7 @@
 /*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/10 20:05:02 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/12 11:29:38 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/15 20:02:05 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ void	display_fps(SDL_Renderer *rend)
 		frame_rate = 1000.0 / (SDL_GetTicks() - c_b);
 	c_b = SDL_GetTicks();
 	sprintf(s, "FPS: %u", frame_rate);
-	sgl_draw_str(s, &(t_font){"SourceSans", 24, 0xFFFFFF, 0},
-							(t_point){10, 5, 0}, rend);
+	sgl_draw_str(s, &(t_font){"SourceSans", 12, 0xEEEEEE, 0},
+							(t_point){10, 10, 0}, rend);
 }
 
 void	display_render_time(t_env *env, SDL_Renderer *rend)
@@ -50,17 +50,22 @@ void	display_render_time(t_env *env, SDL_Renderer *rend)
 		sprintf(s, "Time: %u m %.2f s", min, sec);
 	else
 		sprintf(s, "Time: %.2f s", sec);
-	sgl_draw_str(s, &(t_font){"SourceSans", 24, 0xFFFFFF, 0},
-					(t_point){10, 45, 0}, rend);
+	sgl_draw_str(s, &(t_font){"SourceSans", 12, 0xEEEEEE, 0},
+					(t_point){10, 30, 0}, rend);
 }
 
 void	display_stats(t_env *env, SDL_Renderer *rend)
 {
-	char	s[512];
+	char			s[512];
+	const SDL_Rect	p = {5, 5, 150, 45};
 
+	SDL_SetRenderDrawColor(rend, 0x22, 0x22, 0x22, 0xFF);
+	SDL_RenderFillRect(rend, &p);
+	SDL_SetRenderDrawColor(rend, 0x44, 0x44, 0x44, 0xFF);
+	SDL_RenderFillRect(rend, &(SDL_Rect){p.x + 2, p.y + 2, p.w - 4, p.h - 4});
 	display_fps(rend);
 	display_render_time(env, rend);
 	sprintf(s, "Samples: %u", env->scene.sampls);
-	sgl_draw_str(s, &(t_font){"SourceSans", 24, 0xFFFFFF, 0},
-					(t_point){10, 25, 0}, rend);
+	sgl_draw_str(s, &(t_font){"SourceSans", 12, 0xEEEEEE, 0},
+					(t_point){10, 20, 0}, rend);
 }

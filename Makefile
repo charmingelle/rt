@@ -49,7 +49,6 @@ else
 	INCLUDES	+=	-I./frameworks/SDL2.framework/Headers
 	INCLUDES	+=	-I./frameworks/SDL2_ttf.framework/Headers
 	INCLUDES	+=	-I./frameworks/SDL2_image.framework/Headers
-	INCLUDES	+=	-I./frameworks/SDL2_mixer.framework/Headers
 	INCLUDES	+=	-F./frameworks
 
 	FRAMEWDIR	=	frameworks
@@ -57,7 +56,7 @@ else
 	FRAMEWORKS	=	$(addprefix -F./, $(FRAMEWDIR))
 	FRAMEWORKS	+=	$(addprefix -rpath ./, $(FRAMEWDIR))
 	FRAMEWORKS	+=	-framework OpenGL -framework AppKit -framework OpenCl		\
-					-framework SDL2 -framework SDL2_ttf -framework SDL2_image -framework SDL2_mixer
+					-framework SDL2 -framework SDL2_ttf -framework SDL2_image
 endif
 
 LIBRARIES	=	$(addprefix -L$(LIBFOLDER)/, libft sgl) -lft -lsgl

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   rt.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/15 13:43:42 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/15 19:37:31 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/18 19:22:35 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 # define PROGRAM_NAME "RTv1"
 
 # define KERNEL_FOLDER "./resources/kernels/"
+# define IMAGES_FOLDER "./resources/images/"
 
 # define W_WIDTH 1440
 # define W_HEIGHT 810
@@ -247,5 +248,14 @@ void			cl_parse_kernel(t_cl_core *cl, t_cl_kl *kl,
 
 void			ft_err_handler(const char *msg, const char *add,
 								int err, t_uchar stop);
+
+/*
+**				Anna: added to utils_2.c for torus to work
+**				↓↓↓↓↓↓↓↓↓↓↓↓↓
+*/
+
+// float			vlen(cl_float3 a);
+// cl_float3		vmult(cl_float3 a, float num);
+// cl_float3		normalize(cl_float3 v);
 
 #endif

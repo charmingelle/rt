@@ -6,7 +6,7 @@
 /*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/15 13:43:02 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/16 18:29:17 by grevenko         ###   ########.fr       */
+/*   Updated: 2018/05/17 17:12:44 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ int		main(int ac, char **av)
 	init_env(&env);
 	read_scene(av[1], ac, &env);
 	init_scene(&env);
-	
 	while (true)
 	{
 		render_scene(&env);
@@ -28,7 +27,6 @@ int		main(int ac, char **av)
 			return (sgl_quit(quit_msg, &env));
 		SDL_UpdateTexture(env.win->tex, NULL, env.win->surf->pixels, 1);
 		SDL_RenderCopy(env.win->rend, env.win->tex, NULL, NULL);
-		// draw_info(&(SDL_Rect){.x = 100, .y = 100}, env.win->rend);
 		display_stats(&env, env.win->rend);
 		SDL_RenderPresent(env.win->rend);
 		handle_movement(&env);
