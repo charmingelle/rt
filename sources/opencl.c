@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   opencl.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: skushnir <skushnir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/26 21:20:01 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/14 16:46:38 by skushnir         ###   ########.fr       */
+/*   Updated: 2018/06/13 11:54:03 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,15 @@ static void	build_debug(t_cl_core *cl, t_cl_kl *kl)
 
 void		cl_reinit_mem(t_cl_core *cl, cl_mem *mem, size_t size, void *ptr)
 {
-	clReleaseMemObject(*mem);
+	mem ? clReleaseMemObject(*mem) : 0;
+	if (!cl || !mem || !size)
+		return ;
 	if (!ptr)
 		!(*mem = clCreateBuffer(cl->context, CL_MEM_READ_WRITE, size, 0, 0))
 			? ft_err_handler("OpenCl", "Can't allocate memmory!", 0, 1) : 0;
 	else
-		!(*mem = clCreateBuffer(cl->context, CL_MEM_USE_HOST_PTR, size, ptr, 0))
+		!(*mem = clCreateBuffer(cl->context, CL_MEM_COPY_HOST_PTR,
+			size, ptr, 0))
 			? ft_err_handler("OpenCl", "Can't allocate memmory!", 0, 1) : 0;
 }
 
@@ -67,23 +70,29 @@ void		cl_init(t_cl_core *cl, cl_device_type dev_type)
 void		cl_parse_kernel(t_cl_core *cl, t_cl_kl *kl,
 						const char *kernel_name, const char *func_name)
 {
-	const int	max_source_size = 0x400000;
-	int			fd;
-	cl_int		er;
-	size_t		obj_size;
-	char		*obj_content;
+	static cl_program	backup;
+	static char			*k_n_saved;
+	static char			*obj_content;
+	size_t				obj_size;
+	cl_int				er;
 
-	if (!(fd = open(kernel_name, O_RDONLY)))
-		ft_err_handler("OpenCl", "Fail!", 0, 1);
-	if (!(obj_content = malloc(max_source_size)))
-		ft_err_handler("OpenCl", "Fail!", 0, 1);
-	obj_size = read(fd, obj_content, max_source_size);
-	kl->program = clCreateProgramWithSource(cl->context, 1,
-		(const char **)&obj_content, (const size_t *)&obj_size, &er);
-	ft_memdel((void **)&obj_content);
-	er ? ft_err_handler("OpenCl", "Can't create program!", 0, 1) : 0;
-	er = clBuildProgram(kl->program, 1, &cl->device, "-I ./includes", 0, 0);
+	if (!k_n_saved || ft_strcmp(k_n_saved, kernel_name))
+	{
+		if (!(er = open(kernel_name, O_RDONLY))
+			|| !(obj_content = malloc(MAX_KERNEL_SIZE)))
+			ft_err_handler("OpenCl", "Fail!", 0, 1);
+		obj_size = read(er, obj_content, MAX_KERNEL_SIZE);
+		backup = clCreateProgramWithSource(cl->context, 1,
+				(const char **)&obj_content, (const size_t *)&obj_size, &er);
+		ft_memdel((void **)&obj_content);
+		kl->program = backup;
+		er ? ft_err_handler("OpenCl", "Can't create program!", 0, 1) : 0;
+	}
+	ft_memdel((void **)&k_n_saved);
+	k_n_saved = ft_strdup(kernel_name);
+	er = clBuildProgram(backup, 1, &cl->device,
+		"-I ./includes -cl-fast-relaxed-math", 0, 0);
 	er == CL_BUILD_PROGRAM_FAILURE ? build_debug(cl, kl) : 0;
-	kl->kernel = clCreateKernel(kl->program, func_name, &er);
+	kl->kernel = clCreateKernel(backup, func_name, &er);
 	er ? ft_err_handler("OpenCl", "Can't create kernel!", 0, 1) : 0;
 }

@@ -6,7 +6,7 @@
 /*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/15 15:40:52 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/18 19:23:06 by grevenko         ###   ########.fr       */
+/*   Updated: 2018/06/11 18:29:37 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,33 +28,35 @@ void		parse_camera(char **string, t_cam *pts)
 		else if (!ft_strcmp(name, "\"angles\""))
 			parse_cl_float3(string, &pts->rot);
 		else
-			ft_err_handler("Unknown camera property", 0, 0, 1);
+			ERR("Unknown camera property");
 		SC(string, **string);
 		free(name);
 	}
 	SCB(string);
 }
 
-void		parse_figure(char **string, t_obj *p)
+void		parse_figure(char **string, t_obj *p, t_scene *scene)
 {
 	int			i;
 	char		*name;
 	const char	*sys[] = {"\"type\"", "\"center\"", "\"center2\"", "\"normal\"",
-		"\"emission\"", "\"radius\"", "\"angle\"", "\"color\"", "\"material\"",
-		/*"\"texture\"", */"\"radius2\""};
+	"\"emission\"", "\"radius\"", "\"angle\"", "\"color\"", "\"material\"",
+	"\"radius2\"", "\"specular\"", "\"texture\"", "\"scale\"", "\"center3\""};
 	const void	*data[] = {&p->type, &p->pos, &p->dir, &p->dir, &p->emission,
-		&p->rad, &p->rad, &p->color, &p->material/*, &p->text*/, &p->rad2};
+		&p->rad, &p->rad, &p->color, &p->material, &p->rad2, &p->spec,
+		&p->id_tex, &p->scale, &p->dir2};
 	static void	(*func[])() = {parse_figure_type, parse_cl_float3,
-		parse_cl_float3, parse_cl_float3, parse_cl_float3, parse_float,
-		parse_float, parse_cl_float3, parse_material/*, parse_string*/, parse_float};
+		parse_cl_float3, parse_cl_float3, parse_float, parse_float,
+		parse_float, parse_cl_float3, parse_material, parse_float, parse_float,
+		parse_texture, parse_float, parse_cl_float3};
 
 	SOB(string);
-	while (**string && **string != '}' && (i = -1))
+	while (**string && **string != '}' && (i = -1)
+		&& (name = ft_strsub(*string, 0, GCI(*string))))
 	{
-		name = ft_strsub(*string, 0, GCI(*string));
 		*string = *string + GCI(*string) + 1;
 		while (++i < (int)(sizeof(sys) / sizeof(char *)))
-			FIND_FUNC(name, sys[i], func[i], string, data[i]);
+			FIND_FUNC(name, sys[i], func[i], string, data[i], scene);
 		i >= (int)(sizeof(sys) / sizeof(char *)) ? ERR("Figure property") : 0;
 		SC(string, **string);
 		free(name);
@@ -91,20 +93,23 @@ int			count_objects(char *string)
 
 void		parse_figure_array(char **string, t_scene *pts)
 {
-	int	i;
+	t_obj	*new;
+	uint	i;
 
-	pts->objs_c = count_objects(*string);
-	!(pts->objs_h = ft_memalloc(sizeof(t_obj) * (pts->objs_c + 1)))
-		? ft_err_handler("ft_memalloc", "can't allocate region!", 0, 1) : 0;
-	i = -1;
+	i = 0;
+	if (pts->objs_l)
+		i = ((t_obj *)pts->objs_l->prev->content)->id + 1;
 	SOBK(string);
-	while (++i < (int)pts->objs_c)
+	while (**string && **string != ']')
 	{
-		parse_figure(string, &pts->objs_h[i]);
+		new = ft_memalloc(sizeof(t_obj));
+		new->id = i++;
+		parse_figure(string, new, pts);
+		!new->scale ? new->scale = 1.0F : 0;
+		ft_dlstpush_back(&pts->objs_l, ft_dlstnew(new, sizeof(t_obj)));
 		SC(string, **string);
 	}
 	SCBK(string);
-	pts->objs_h[pts->objs_c].type = -1;
 }
 
 void		parse_scene(char **string, t_env *env)
@@ -122,8 +127,12 @@ void		parse_scene(char **string, t_env *env)
 			parse_camera(string, env->cam);
 		else if (!ft_strcmp(name, "\"figures\""))
 			parse_figure_array(string, &env->scene);
+		else if (!ft_strcmp(name, "\"ambient_light\""))
+			parse_float(string, &env->scene.ambient_light);
+		else if (!ft_strcmp(name, "\"external_object\""))
+			parse_source(string, env);
 		else
-			ft_err_handler("Unknown scene property", 0, 0, 1);
+			ERR("Unknown scene property");
 		SC(string, **string);
 		free(name);
 	}

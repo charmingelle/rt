@@ -6,7 +6,7 @@
 #    By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/12/10 17:05:19 by pgritsen          #+#    #+#              #
-#    Updated: 2018/05/14 16:26:39 by pgritsen         ###   ########.fr        #
+#    Updated: 2018/06/13 12:19:27 by pgritsen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ OS			=	$(shell uname)
 ifeq ($(OS), Linux)
 	CFLAGS		=	-Wextra -Wall -O3 -g3
 else
-	CFLAGS		=	-Wextra -Werror -Wall -O3 -g3
+	CFLAGS		=	-Wextra -Werror -Wall -O3 -flto=thin -g3
 endif
 
 HDRS		=	sgl.h sgl_private.h
@@ -28,7 +28,11 @@ SRCS		=	sgl_draw_line.c sgl_plot_rend.c sgl_plot_surf.c sgl_new_window.c	\
 				sgl_get_window.c sgl_init.c sgl_get_font.c sgl_add_font.c sgl_quit.c\
 				sgl_draw_str.c sgl_get_window_by_id.c s_sys_handler.c sgl_vsync.c	\
 				sgl_get_surf.c sgl_get_tex.c sgl_win_resize.c sgl_atop.c			\
-				sgl_check_point.c sgl_rotate_point.c
+				sgl_check_point.c sgl_rotate_point.c sgl_imgload.c sgl_surftotex.c	\
+				sgl_str_size.c sgl_controls_visible.c sgl_new_control.c				\
+				sgl_draw_str_center.c sgl_find_control.c sgl_handle_controls.c		\
+				sgl_textbox_input.c sgl_draw_controls.c sgl_draw_textbox.c			\
+				sgl_draw_button.c sgl_draw_border.c
 
 OBJDIR		=	obj
 

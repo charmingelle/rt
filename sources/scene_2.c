@@ -6,7 +6,7 @@
 /*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/15 15:40:47 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/15 18:19:27 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/06/12 17:45:03 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,17 +40,17 @@ void		parse_figure_type(char **string, short int *pts)
 	int			end;
 	char		*figure_name;
 	int			i;
-	const char	*types[] = {"\"sphere\"", "\"cylinder\"", "\"cone\"",
-		"\"plane\"", "\"ellipsoid\"", "\"parabolid\"", "\"hyperboloid\"",
-		"\"disk\"", "\"cube\"", "\"torus\"", "\"mebius\""};
+	const char	**types;
+	long		size;
 
+	types = get_obj_type(-1, 0, &size);
 	end = get_primitive_end(*string);
 	figure_name = ft_strsub(*string, 0, end);
 	i = -1;
-	while (++i < (int)(sizeof(types) / sizeof(char *)))
+	while (++i < size)
 		if (!ft_strcmp(figure_name, types[i]) && ((*pts = i) + 1))
 			break ;
-	i >= (int)(sizeof(types) / sizeof(char *)) ? ERR("Unknown figure type") : 0;
+	i >= size ? ERR("Unknown figure type") : 0;
 	free(figure_name);
 	*string = *string + end;
 }
@@ -61,7 +61,7 @@ void		parse_material(char **string, t_material *pts)
 	char		*material_name;
 	int			i;
 	const char	*types[] = {"\"diffuse\"", "\"emissive\"", "\"reflect\"",
-		"\"transparent\""};
+		"\"transparent\"", "\"glass\"", "\"negative\""};
 
 	end = get_primitive_end(*string);
 	material_name = ft_strsub(*string, 0, end);

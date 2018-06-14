@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: cozzmonavt <cozzmonavt@student.42.fr>      +#+  +:+       +#+         #
+#    By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/11/01 13:50:42 by pgritsen          #+#    #+#              #
-#    Updated: 2018/03/10 15:10:03 by cozzmonavt       ###   ########.fr        #
+#    Updated: 2018/06/13 12:19:26 by pgritsen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ OS			=	$(shell uname)
 ifeq ($(OS), Linux)
 	CFLAGS		=	-Wextra -Wall -O3 -g3
 else
-	CFLAGS		=	-Wextra -Werror -Wall -O3 -g3
+	CFLAGS		=	-Wextra -Werror -Wall -O3 -flto=thin -g3
 endif
 
 SRCS		= 	ft_lstnew.c ft_strcat.c ft_strncpy.c ft_memalloc.c ft_strchr.c		\
@@ -42,7 +42,8 @@ SRCS		= 	ft_lstnew.c ft_strcat.c ft_strncpy.c ft_memalloc.c ft_strchr.c		\
 				ft_nbrblen.c ft_putnp.c ft_strnplen.c ft_degtorad.c ft_atol_base.c	\
 				ft_swap.c ft_dlstnew.c ft_dlstpush.c ft_dlstpush_back.c				\
 				ft_dlstdelelem.c ft_dlstsize.c ft_dlstpop.c ft_dlstpop_back.c		\
-				ft_dlstclear.c ft_get_fractional.c ft_get_content.c ft_atof.c
+				ft_dlstclear.c ft_get_fractional.c ft_get_content.c ft_atof.c		\
+				ft_memjoin.c ft_dlstindex.c
 
 HDRS		=	ftprintf.h libft.h ftstring.h
 

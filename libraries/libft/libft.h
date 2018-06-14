@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: grevenko <grevenko@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/04 13:45:39 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/03/05 21:08:14 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/06/07 20:29:23 by grevenko         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,8 @@ typedef int		t_wint;
 /*
 **		Linked list functions
 */
+
+t_dlist			*ft_dlstindex(t_dlist *lst, size_t index);
 
 t_list			*ft_lstnew(void const *content, size_t content_size);
 
@@ -292,6 +294,9 @@ double			ft_get_fractional(double num);
 char			*ft_get_content(const char *src, char open, char close);
 
 double			ft_atof(const char *src);
+
+void			*ft_memjoin(const void *m1, const void *m2,
+							size_t b1, size_t b2);
 
 /*
 **		Circular double linked list functions

@@ -6,7 +6,7 @@
 /*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/09 17:01:23 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/10 20:41:03 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/19 17:12:34 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,14 @@ inline static void	destroy_wins(void)
 	next = win->next;
 	while ((win = next) != g_win_list)
 	{
-		tmp = *(t_sgl_window **)win->content;
+		tmp = (t_sgl_window *)win->content;
 		ft_memdel((void **)&tmp->title);
+		SDL_FreeSurface(tmp->surf);
+		SDL_DestroyTexture(tmp->tex);
+		SDL_DestroyRenderer(tmp->rend);
 		SDL_DestroyWindow(tmp->p);
 		next = win->next;
 		ft_memdel((void **)&tmp);
-		ft_memdel((void **)&win->content);
 		ft_memdel((void **)&win);
 	}
 	ft_memdel((void **)&g_win_list);
@@ -47,12 +49,11 @@ inline static void	destroy_fonts(void)
 	next = font->next;
 	while ((font = next) != g_font_list)
 	{
-		tmp = *(t_font **)font->content;
+		tmp = (t_font *)font->content;
 		ft_memdel((void **)&tmp->name);
 		TTF_CloseFont(tmp->ttf);
 		next = font->next;
 		ft_memdel((void **)&tmp);
-		ft_memdel((void **)&font->content);
 		ft_memdel((void **)&font);
 	}
 	ft_memdel((void **)&g_font_list);

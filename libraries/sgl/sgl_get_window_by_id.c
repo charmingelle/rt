@@ -6,7 +6,7 @@
 /*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/09 20:10:37 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/01/09 20:12:27 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/05/19 16:29:43 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ t_sgl_window	*sgl_get_window_by_id(t_uint id)
 	win = g_win_list;
 	while ((win = win->next) != g_win_list)
 	{
-		tmp = *(t_sgl_window **)win->content;
+		tmp = (t_sgl_window *)win->content;
 		if (tmp->id == id)
 			return (tmp);
 	}

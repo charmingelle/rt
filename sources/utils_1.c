@@ -6,7 +6,7 @@
 /*   By: pgritsen <pgritsen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/23 14:16:00 by pgritsen          #+#    #+#             */
-/*   Updated: 2018/05/14 18:23:08 by pgritsen         ###   ########.fr       */
+/*   Updated: 2018/06/13 12:09:57 by pgritsen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,21 +34,27 @@ t_point		topoint(cl_float3 point)
 
 inline void	display_usage(t_uchar help)
 {
-	ft_printf("Usage: ./RTv1 [scene file]\n");
+	ft_printf("Usage: {green}./RT{nc} [{cyan}scene file | -help{nc}]\n");
 	!help ? exit(0) : 0;
 	ft_printf("{cyan}Scene file format:{nc}\n"
-"  [Objects on scene] [Light on scene]\n"
-"  [{$camera_x;$camera_y;$camera_z}, {$camera_rx;$camera_ry;$camera_rz},"
-											" $camera_rotation_offset]\n"
-"  \n{cyan}Objects and Light:{nc}\n"
-"  {red}For sphere:{nc} sphere[$color, {$x;$y;$z}, $radius,"
-											" $specular, $reflect]\n"
-"  {red}For cylinder:{nc} cylinder[$color, {$x1;$y1;$z1}, {$x2;$y2;$z2},"
-											" $radius, $specular, $reflect]\n"
-"  {red}For cone:{nc} cone[$color, {$x1;$y1;$z1}, {$x2;$y2;$z2},"
-											" $radius, $specular, $reflect]\n"
-"  {red}For plane:{nc} plane[$color, {$x;$y;$z}, {$Nx;$Ny;$Nz},"
-											" $specular, $reflect]\n");
+"    It's simple JSON format, you can set up {green}camera, ambient_light,\n"
+"  figures and external .obj files.{nc}\n{cyan}Map example:{nc}\n"
+"{\n"
+"  \"camera\": {\n"
+"    \"position\": [0, 0.5, -4],\n"
+"    \"angles\": [0, 0, 0]\n"
+"  },\n"
+"  \"ambient_light\" : 0.1,\n"
+"  \"figures\": [\n"
+"    {\n"
+"      \"type\": \"sphere\",\n"
+"      \"center\": [0, 0, 0],\n"
+"      \"radius\": 1\n"
+"      \"color\": [0.9, 0.67, 0.44],\n"
+"      \"material\": \"diffuse\"\n"
+"    }\n"
+"  ]\n"
+"}\n");
 	exit(0);
 }
 
@@ -78,9 +84,8 @@ void		init_env(t_env *env)
 	env->cam->vwp = ft_memalloc(sizeof(t_viewport));
 	resize_viewport(env->cam->vwp, env->win->w, env->win->h);
 	env->cam->vwp->dist = 1;
+	env->sel_obj.pos = (SDL_Rect){25, 60, 0, 0};
+	env->sel_obj.obj.type = -1;
+	env->move_speed = 0.008F;
 	cl_init(&env->cl, CL_DEVICE_TYPE_GPU);
-	cl_parse_kernel(&env->cl, &env->cam->kl,
-		KERNEL_FOLDER"render.cl", "render_scene");
-	cl_reinit_mem(&env->cl, &env->cam->kl.mem,
-		sizeof(cl_float3) * env->win->w * env->win->h, 0);
 }
